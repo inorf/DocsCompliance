@@ -1,0 +1,211 @@
+.page {
+  --background: #d4d4d4;
+  --foreground: #d4d4d4;
+
+  --text-primary: #000;
+  --text-secondary: #444;
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+  --button-secondary-border: #ebebeb;
+
+  display: flex;
+  min-height: 100vh;
+  min-width: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  position: fixed;
+
+  /* Стили начала анимации (Скрытое состояние) */
+  opacity: 0;
+  visibility: hidden; /* <-- ДОБАВЛЕНО/ИСПРАВЛЕНО: Скрывает клики */
+  transform: translateY(100vh);
+
+  /* Плавность перехода */
+  transition: 
+    opacity 0.8s ease, 
+    transform 0.8s ease,
+    visibility 0.8s;
+}
+
+.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+  visibility:visible;
+}
+
+/* Плавное исчезновение */
+.fadeOut {
+  opacity: 0;
+  transform: translateY(20px);
+  visibility: hidden;
+}
+
+.main {
+  display: flex;
+  width: 50%;
+  min-width: min-content;
+  height: fit-content;
+  max-width: fit-content;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content:center;
+  background-color: var(--foreground);
+  border-radius: 3vh;
+}
+
+.DivLog {
+  max-width: max-content;
+  padding: 3vw 3vw 3vw 4vw;
+  background-color: #fafafa;
+  border-radius: 2vh 0vh 0vh 2vh;
+}
+
+.welc {
+  padding-top: 5vh;
+}
+
+.DivLog p {
+  color: #444444;
+  margin-bottom: 3vh;
+}
+
+.DivLog h2 {
+  min-width: max-content;
+  text-align: center;
+}
+
+.LogForm {
+  margin-top: 2vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.LogForm input {
+  margin-bottom: 2vh;
+  width: 20vw;
+  min-width: fit-content;
+  height: 4vh;
+  border-radius: 2vh;
+  border: 1px solid rgb(0, 140, 140);
+  padding-left: 1vh;
+  font-size: small;
+  transition: all 0.3s ease;
+}
+
+.formDiv {
+  width: 20vw;
+  display: flex;
+  justify-content: center;
+  gap: 2vw;
+}
+
+.DivDesc {
+  max-width: min-content;
+  padding: 4vw 2vw 4vw 4vw;
+  background-color: rgb(0, 140, 140);
+  border-radius: 0vh 2vh 2vh 0vh;
+}
+
+.DivDesc p {
+  min-width: 16vw;
+  font-size: medium;
+  color: whitesmoke
+}
+.DivDesc p span {
+  font-weight: bold;
+}
+
+.DivDesc .copy {
+  margin-top: 2vh;
+  font-weight: bold;
+  color: whitesmoke;
+  font-size: small;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  
+}
+
+@media (max-width: 750px) {
+  
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    --background: #121212;
+    --foreground: #1a1a1a;
+
+    --text-primary: #f0f0f0;
+    --text-secondary: #bbb;
+
+    --button-primary-hover: #cfcfcf;
+    --button-secondary-hover: #2a2a2a;
+    --button-secondary-border: #333333;
+  }
+  
+  .main {
+    background-color: #1a1a1a;
+    box-shadow: 0 0 35px rgb(0, 140, 140);
+  }
+
+  .DivLog {
+    background-color: rgb(40, 40, 40);
+  }
+  .DivLog p {
+    color: #bbbbbb;
+  }
+
+  .LogForm input:hover{
+    background-color: rgb(44, 44, 44);
+  }
+
+  .LogForm button {
+  max-width: 8vw;
+  min-width: fit-content;
+  height: 4vh;
+  border-radius: 2vh;
+  border: rgb(0, 140, 140) 1px solid;
+  background-color: rgb(40, 40, 40);
+  color: rgb(0, 140, 140);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  padding-inline: 2vw;
+  }
+
+  .LogForm button:hover {
+    background-color: rgb(0, 140, 140);
+    color: whitesmoke;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .LogForm button {
+  max-width: 8vw;
+  min-width: fit-content;
+  height: 4vh;
+  border-radius: 2vh;
+  border: rgb(0, 140, 140) 1px solid;
+  background-color: whitesmoke;
+  color: rgb(0, 140, 140);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  padding-inline: 2vw;
+  }
+
+  .LogForm input:hover{
+    background-color: #d4d4d4;
+  }
+
+  .LogForm button:hover {
+    background-color: rgb(0, 140, 140);
+    color: whitesmoke;
+  }
+}
