@@ -40,3 +40,53 @@ a {
     color-scheme: dark;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    --background: #121212;
+    --foreground: #1a1a1a;
+    --text-primary: #f0f0f0;
+    --text-secondary: #bbb;
+    --button-primary-hover: #cfcfcf;
+    --button-secondary-hover: #2a2a2a;
+    --button-secondary-border: #333333;
+  }
+}
+
+.page {
+  --background: #d4d4d4;
+  --foreground: #d4d4d4;
+  --text-primary: #000;
+  --text-secondary: #444;
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+  --button-secondary-border: #ebebeb;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 100%;
+  align-items: center;
+  justify-content:first baseline;
+  background-color: var(--background);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.topContent {
+  margin-bottom: 2rem;
+}
+
+.topContent button {
+  padding: 12px 24px;
+  background: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.topContent button:hover {
+  background: #0051a8;
+}

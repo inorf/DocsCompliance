@@ -11,12 +11,39 @@
 
   display: flex;
   min-height: 100vh;
-  min-width: 80%;
+  min-width: 100%;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-geist-sans);
   background-color: var(--background);
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  position: fixed;
+
+  /* Стили начала анимации (Скрытое состояние) */
+  opacity: 0;
+  visibility: hidden; /* <-- ДОБАВЛЕНО/ИСПРАВЛЕНО: Скрывает клики */
+  transform: translateY(100vh);
+
+  /* Плавность перехода */
+  transition: 
+    opacity 0.8s ease, 
+    transform 0.8s ease,
+    visibility 0.8s;
+}
+
+.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+  visibility:visible;
+}
+
+/* Плавное исчезновение */
+.fadeOut {
+  opacity: 0;
+  transform: translateY(20px);
+  visibility: hidden;
 }
 
 .main {
@@ -73,7 +100,12 @@
   transition: all 0.3s ease;
 }
 
-
+.formDiv {
+  width: 20vw;
+  display: flex;
+  justify-content: center;
+  gap: 2vw;
+}
 
 .DivDesc {
   max-width: min-content;
@@ -119,6 +151,7 @@
     --button-secondary-hover: #2a2a2a;
     --button-secondary-border: #333333;
   }
+  
   .main {
     background-color: #1a1a1a;
     box-shadow: 0 0 35px rgb(0, 140, 140);
@@ -136,7 +169,7 @@
   }
 
   .LogForm button {
-  width: 8vw;
+  max-width: 8vw;
   min-width: fit-content;
   height: 4vh;
   border-radius: 2vh;
@@ -145,6 +178,7 @@
   color: rgb(0, 140, 140);
   font-weight: bold;
   transition: all 0.3s ease;
+  padding-inline: 2vw;
   }
 
   .LogForm button:hover {
@@ -154,7 +188,7 @@
 }
 @media (prefers-color-scheme: light) {
   .LogForm button {
-  width: 8vw;
+  max-width: 8vw;
   min-width: fit-content;
   height: 4vh;
   border-radius: 2vh;
@@ -163,6 +197,7 @@
   color: rgb(0, 140, 140);
   font-weight: bold;
   transition: all 0.3s ease;
+  padding-inline: 2vw;
   }
 
   .LogForm input:hover{
