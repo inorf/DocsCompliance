@@ -1,13 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-color-light: whitesmoke;
 }
 
 html,
@@ -22,6 +16,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
 }
 
 * {
@@ -39,54 +34,95 @@ a {
   html {
     color-scheme: dark;
   }
-}
 
-@media (prefers-color-scheme: dark) {
+  /* :root {
+  } */
+
   .page {
     --background: #121212;
-    --foreground: #1a1a1a;
-    --text-primary: #f0f0f0;
-    --text-secondary: #bbb;
-    --button-primary-hover: #cfcfcf;
-    --button-secondary-hover: #2a2a2a;
-    --button-secondary-border: #333333;
+
+    display: flex;
+    min-width: min-content;
+    height: fit-content;
+    max-width: fit-content;
+    flex-direction: column;
+    min-height: 100vh;
+    min-width: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .page {
+    --background: rgb(212, 212, 212);
+
+    display: flex;
+    min-width: min-content;
+    height: fit-content;
+    max-width: fit-content;
+    flex-direction: column;
+    min-height: 100vh;
+    min-width: 100vw;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+
+  html{
+    background-color: var(--background);
   }
 }
 
-.page {
-  --background: #d4d4d4;
-  --foreground: #d4d4d4;
-  --text-primary: #000;
-  --text-secondary: #444;
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
+.MenuDiv {
+  width: 20vw;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-width: 100%;
   align-items: center;
-  justify-content:first baseline;
-  background-color: var(--background);
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
-.topContent {
-  margin-bottom: 2rem;
+.TopContent {
+  width: 100%;
+  padding: 2vh;
+  background-color: #0051a8;
+  border-radius: 2vh 2vh 0 0;
+  height: fit-content;
+  text-align: center;
+  justify-content:center;
 }
 
-.topContent button {
-  padding: 12px 24px;
+.TopContent p {
+  font-weight: bold;
+  font-size: large;
+  color: var(--font-color-light);
+}
+
+.ButContent {
+  width: 100%;
+  height: fit-content;
+  flex-direction: column;
+  justify-content:space-between;
+  align-items: center;
+  background-color: red;
+  border-radius: 0 0 2vh 2vh;
+  padding: 3vh 3vh;
+}
+
+.ButContent button {
+  width: 100%;
+  padding: 2vh 2vw;
   background: #0070f3;
-  color: white;
+  color: var(--font-color-light);
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
   transition: background 0.3s;
+  margin-top: 1vh;
 }
 
-.topContent button:hover {
+.ButContent button:hover {
   background: #0051a8;
 }

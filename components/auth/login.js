@@ -20,11 +20,11 @@ export default function Login({ onToggleVisibility}){
             Welcome Back!
           </h4>
           <p>
-            Sing in to start save your time & money.
+            Log in to start save your time & money.
           </p>
           <div>
             <form className={styles.LogForm}>
-              <input placeholder="Login" type="text"></input>
+              <input placeholder="E-mail" type="email"></input>
               <input placeholder="P@ssword" type="password"></input>
               <div className={styles.formDiv}>
                 <button className={styles.sub} type="submit">Sign In</button>

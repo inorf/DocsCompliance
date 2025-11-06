@@ -1,5 +1,5 @@
 .page {
-  --background: #d4d4d4;
+  --background: rgba(212, 212, 212, 0.2);
   --foreground: #d4d4d4;
 
   --text-primary: #000;
@@ -21,16 +21,13 @@
   top: 0;
   position: fixed;
 
-  /* Стили начала анимации (Скрытое состояние) */
   opacity: 0;
-  visibility: hidden; /* <-- ДОБАВЛЕНО/ИСПРАВЛЕНО: Скрывает клики */
+  visibility: hidden;
   transform: translateY(100vh);
-
-  /* Плавность перехода */
   transition: 
-    opacity 0.8s ease, 
-    transform 0.8s ease,
-    visibility 0.8s;
+    opacity 0.5s ease, 
+    transform 0.5s ease,
+    visibility 0.4s;
 }
 
 .fadeIn {
@@ -39,7 +36,6 @@
   visibility:visible;
 }
 
-/* Плавное исчезновение */
 .fadeOut {
   opacity: 0;
   transform: translateY(20px);
@@ -141,7 +137,7 @@
 
 @media (prefers-color-scheme: dark) {
   .page {
-    --background: #121212;
+    --background: rgba(18, 18, 18, 0.2);
     --foreground: #1a1a1a;
 
     --text-primary: #f0f0f0;
