@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from "react";
 
 export default function Login() {
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -19,6 +20,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Login attempt:", formData.email, formData.password );
+    //тут потом будет проверка попроавности данных, существует ли пользователь и тд
   };
 
   return (
@@ -48,7 +50,9 @@ export default function Login() {
             />
             
             <div className={styles.formDiv}>
-              <button className={styles.sub} type="submit">Sign In</button>
+              <Link href="/join" onNavigate={(e) => {
+                console.log("Login attempt:", formData.email, formData.password );
+              }}><button className={styles.sub} type="submit">Sign In</button></Link>
             </div>
           </form>
           </div>

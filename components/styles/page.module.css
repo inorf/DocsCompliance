@@ -46,6 +46,7 @@
   justify-content:center;
   background-color: var(--foreground);
   border-radius: 3vh;
+  box-shadow: -10px 10px 10px 1px rgb(0, 80, 80);
 }
 
 .DivLog {
@@ -53,6 +54,7 @@
   padding: 3vw 3vw 2vw 4vw;
   background-color: #fafafa;
   border-radius: 2vh 0vh 0vh 2vh;
+  border: 1px solid rgb(0, 140, 140);
 }
 
 .welc {
