@@ -57,7 +57,9 @@ export default function SignUp() {
             />
             
             <div className={styles.formDiv}>
-              <button className={styles.sub} type="submit">Sign Up</button>
+              <Link href="/join" onNavigate={(e) => {
+                console.log("Login attempt:", formData.email, formData.password );
+              }}><button className={styles.sub} type="submit">Sign Up</button></Link>
             </div>
           </form>
           </div>

@@ -25,11 +25,7 @@ a {
     --background: #121212;
 
     display: flex;
-    min-width: min-content;
-    height: fit-content;
-    max-width: fit-content;
-    flex-direction: column;
-    min-height: 100vh;
+    min-height: 100%;
     min-width: 100%;
     align-items: center;
     justify-content: center;
@@ -42,12 +38,8 @@ a {
     --background: rgb(212, 212, 212);
 
     display: flex;
-    min-width: min-content;
-    height: fit-content;
-    max-width: fit-content;
-    flex-direction: column;
-    min-height: 100vh;
-    min-width: 100vw;
+    min-height: 100%;
+    min-width: 100%;
     align-items: center;
     justify-content: center;
     background-color: var(--background);
