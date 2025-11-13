@@ -53,13 +53,14 @@ html {
         width: 220px;
         background: rgb(0, 140, 140);
         padding: 1rem;
-        transform: translateX(-100%);
+        transform: translateX(-150%);
         transition: transform 0.3s ease;
-        position: relative;
+        position:absolute;
+        height: 82vh;
 
         &.open {
         transform: translateX(0);
-        box-shadow: 0 0 10px 1px #555;
+        box-shadow: 0px 10px 10px #555;
         }
 
         nav {
