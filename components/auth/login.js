@@ -2,6 +2,7 @@
 import styles from "../styles/page.module.css";
 import Link from 'next/link';
 import { useState } from "react";
+import UserProfile from '../../app/session/UserProfile';
 
 export default function Login() {
 
@@ -19,7 +20,6 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempt:", formData.email, formData.password );
     //тут потом будет проверка попроавности данных, существует ли пользователь и тд
   };
 
@@ -32,26 +32,31 @@ export default function Login() {
           <p>Log in to start save your time & money.</p>
           <div>
           <form className={styles.LogForm} onSubmit={handleSubmit}>
-            <input 
-              placeholder="E-mail" 
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            <input 
-              placeholder="P@ssword" 
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            
+            <div className={styles.mail} >
+              <input 
+                placeholder="E-mail" 
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+              <img src="/icon/mail_Icon.png" alt="Mail Icon" className={styles.mailIcon} />
+            </div>
+            <div className={styles.pass} >
+              <input 
+                placeholder="P@ssword" 
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <img src="/icon/lock_Icon.png" alt="lock Icon" className={styles.lockIcon} />
+            </div>
             <div className={styles.formDiv}>
               <Link href="/join" onNavigate={(e) => {
-                console.log("Login attempt:", formData.email, formData.password );
+                UserProfile.setEmail(formData.email);
               }}><button className={styles.sub} type="submit">Sign In</button></Link>
             </div>
           </form>

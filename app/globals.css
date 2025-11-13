@@ -2,6 +2,10 @@
   --font-color-light: whitesmoke;
   --background: rgb(212, 212, 212);
   --foreground: #171717;
+  
+    background-image: url(../public/background/bg_login.png);
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 @media (prefers-color-scheme: dark) {

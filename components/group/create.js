@@ -3,6 +3,7 @@
 import Mstyle from "../styles/group.module.css";
 import Link from 'next/link';
 import { useState } from "react";
+import UserProfile from '../../app/session/UserProfile';
 
 export default function create() {
 
@@ -24,15 +25,19 @@ export default function create() {
             <div className={Mstyle.main}>
                     <h3>Make your own group!</h3>
                 <form className={Mstyle.connForm} onSubmit={handleSubmit}>
-                    <input 
-                    placeholder="Type a name of your group" 
-                    type="text"
-                    name="name"
-                    value={Group.name}
-                    onChange={handleChange}
-                    required
-                    />
-                    <button type="submit">Create Group</button>
+                    <div className={Mstyle.Uname} >
+                        <input 
+                            placeholder="Type a name of your group" 
+                            type="text"
+                            name="name"
+                            value={Group.name}
+                            onChange={handleChange}
+                            required
+                        />
+                        <img src="/icon/pen_Icon.png" alt="Pen Icon" className={Mstyle.penIcon} />
+                    </div>
+                    <Link href="/mainPage" onNavigate={(e) => {UserProfile.setGName(Group.name);}}><button type="submit">Create Group</button></Link>
+                    
                 </form>
                 <div className={Mstyle.createLink}>
                     <p>Want to connect to a group? <Link href="/join">Click here!</Link></p>

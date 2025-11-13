@@ -8,7 +8,6 @@
     min-width: 100%;
     align-items: center;
     justify-content: center;
-    background-color: var(--background);
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   }
 
@@ -53,7 +52,6 @@
     min-width: 100%;
     align-items: center;
     justify-content: center;
-    background-color: var(--background);
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   }
 
@@ -99,7 +97,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 3vh;
-    padding: 2vh 4vw 4vh 4vw;
+    padding: 3vh 5vw 5vh 5vw;
     border: 1px solid rgb(0, 140, 140);
     box-shadow: -10px 10px 10px 1px rgb(0, 80, 80);
 }
@@ -125,10 +123,37 @@
     border-radius: 2vh;
     border: 1px solid rgb(0, 140, 140);
     padding-left: 1vh;
+    padding-right: 2vh;
     font-size: small;
     transition: all 0.3s ease;
 }
 
 .createLink {
     margin-inline: 2vw;
+}
+
+.mail {
+  position: relative;
+  display: inline-block;
+}
+
+.mailIcon {
+    position: absolute;
+    right: 0.8rem;
+    top: 20%;
+    pointer-events: none;
+    width: 1.1rem;
+}
+
+.Uname {
+  position: relative;
+  display: inline-block;
+}
+
+.penIcon {
+    position: absolute;
+    right: 0.8rem;
+    top: 20%;
+    pointer-events: none;
+    width: 1.1rem;
 }

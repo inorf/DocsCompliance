@@ -1,3 +1,5 @@
+
+
 .page {
   --background: rgba(212, 212, 212, 0.2);
   --foreground: #d4d4d4;
@@ -14,25 +16,6 @@
   top: 0;
   position: fixed;
 
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(100vh);
-  transition: 
-    opacity 0.5s ease, 
-    transform 0.5s ease,
-    visibility 0.4s;
-}
-
-.fadeIn {
-  opacity: 1;
-  transform: translateY(0);
-  visibility:visible;
-}
-
-.fadeOut {
-  opacity: 0;
-  transform: translateY(20px);
-  visibility: hidden;
 }
 
 .main {
@@ -110,6 +93,7 @@
   font-size: medium;
   color: whitesmoke
 }
+
 .DivDesc p span {
   font-weight: bold;
 }
@@ -119,6 +103,45 @@
   font-weight: bold;
   color: whitesmoke;
   font-size: small;
+}
+
+.mail {
+  position: relative;
+  display: inline-block;
+}
+
+.mailIcon {
+    position: absolute;
+    right: 0.8rem;
+    top: 20%;
+    pointer-events: none;
+    width: 1.1rem;
+}
+
+.Uname {
+  position: relative;
+  display: inline-block;
+}
+
+.penIcon {
+    position: absolute;
+    right: 0.8rem;
+    top: 20%;
+    pointer-events: none;
+    width: 1.1rem;
+}
+
+.pass {
+  position: relative;
+  display: inline-block;
+}
+
+.lockIcon {
+    position: absolute;
+    right: 0.8rem;
+    top: 20%;
+    pointer-events: none;
+    width: 1.1rem;
 }
 
 /* Enable hover only on non-touch devices */
@@ -144,6 +167,7 @@
   .DivLog {
     background-color: rgb(40, 40, 40);
   }
+
   .DivLog p {
     color: #bbbbbb;
   }
