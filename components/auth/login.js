@@ -78,10 +78,7 @@ export default function Login() {
               <img src="/icon/lock_Icon.png" alt="lock Icon" className={styles.lockIcon} />
             </div>
             <div className={styles.formDiv}>
-              <Link href="/mainPage" onClick={(e) => {
-                if (isLoading || !loginSuccess){ e.preventDefault();
-                  handleLogin()
-                }}}>
+              <Link href="/mainPage" onClick={(e) => {e.preventDefault(); handleLogin()}}>
                 <button className={styles.sub} type="submit" disabled={isLoading}>
                   {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>

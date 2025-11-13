@@ -91,11 +91,7 @@ export default function SignUp() {
             </div>
             
             <div className={styles.formDiv}>
-              <Link href="/join" onClick={(e) => {
-                console.log(formData.email, formData.password)
-                if (isLoading || !signUpSuccess){ e.preventDefault();
-                  handleSingUp()
-                }}}>
+              <Link href="/join" onClick={(e) => {e.preventDefault(); handleSingUp()}}>
                 <button className={styles.sub} type="submit" disabled={isLoading}>
                   {isLoading ? 'Signing Up...' : 'Sign Up'}
                 </button>
