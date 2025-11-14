@@ -2,14 +2,25 @@ import { NextResponse } from 'next/server'
 import textract from 'textract'
 import PDFParse from 'pdf-parse'
 import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
+import { getUser } from '../../../lib/auth'
 
 async function getAdmin(){ return getSupabaseAdmin() }
 
 export async function POST(request) {
     try {
-        const { file_name, contId } = await request.json()
+        const { file_name, contId, userEmail } = await request.json()
         if (!file_name || !contId) {
             return NextResponse.json({ success: false, error: 'File name and contract ID are required' }, { status: 400 })
+        }
+
+        // Validate that the user exists and is authenticated
+        if (!userEmail) {
+            return NextResponse.json({ success: false, error: 'User email is required' }, { status: 400 })
+        }
+        
+        const userData = await getUser(userEmail)
+        if (!userData.success) {
+            return NextResponse.json({ success: false, error: 'User not authenticated' }, { status: 401 })
         }
 
         const fileExt = file_name.split('.').pop().toLowerCase()

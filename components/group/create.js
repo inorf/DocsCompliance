@@ -1,60 +1,84 @@
 "use client"
-// import Gstyle from "../../app/globals.css";
 import Mstyle from "../styles/group.module.css";
 import Link from 'next/link';
 import { useState } from "react";
 import UserProfile from '../../app/session/UserProfile';
-import { createGroup } from "@/lib/group";
 import { useRouter } from "next/navigation";
 
-export default function create() {
+export default function Create() {
     const [group, setGroup] = useState({name: ""});
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
     const router = useRouter();
+    
     const handleChange = (e) => {
         setGroup(prev => ({
-        ...prev,
-        [e.target.name]: e.target.value
+            ...prev,
+            [e.target.name]: e.target.value
         }));
+        setErrorMsg(null);
     };
 
-    const handleCreate = async (e) => {
-    try {
-      console.log("User email: "+UserProfile.getEmail())
-      const createSuccess = await createGroup(UserProfile.getEmail(), group.name);      
-      if (createSuccess.success) {
-        UserProfile.setGName(group.name);
-        console.log(UserProfile.getGName())
-        router.push('/mainPage')
-      } else{
-        throw new Error(createSuccess.error)
-      }
-    } catch (error) {
-      console.error('Create failed:', error);
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setErrorMsg(null);
+        setIsLoading(true);
+        
+        try {
+            const userEmail = UserProfile.getEmail();
+            if (!userEmail) throw new Error('No user logged in');
+            if (!group.name.trim()) throw new Error('Group name is required');
+
+            const res = await fetch('/api/group/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail, groupName: group.name.trim() })
+            });
+
+            const createData = await res.json();
+            if (!createData.success) throw new Error(createData.error || 'Failed to create group');
+
+            UserProfile.setGName(group.name.trim());
+            router.push('/mainPage');
+        } catch (error) {
+            console.error('Create failed:', error);
+            setErrorMsg(error.message || 'Failed to create group. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
     return (
         <div className={Mstyle.page}>
             <div className={Mstyle.main}>
-                    <h3>Make your own group!</h3>
-                <form className={Mstyle.connForm}>
-                    <div className={Mstyle.Uname} >
+                <h3>Make your own group!</h3>
+                <form className={Mstyle.connForm} onSubmit={handleSubmit} aria-live="polite">
+                    <div className={Mstyle.Uname}>
                         <input 
+                            id="groupName"
                             placeholder="Type a name of your group" 
                             type="text"
                             name="name"
                             value={group.name}
                             onChange={handleChange}
                             required
+                            aria-required="true"
+                            aria-invalid={errorMsg ? "true" : "false"}
                         />
                         <img src="/icon/pen_Icon.png" alt="Pen Icon" className={Mstyle.penIcon} />
                     </div>
-                    <Link href="/mainPage" onNavigate={(e) => {e.preventDefault(); handleCreate()}}><button type="submit">Create Group</button></Link>
-                    
+                    {errorMsg && (
+                        <div role="alert" style={{color:'red', marginTop: '10px', fontSize: '14px'}}>
+                            {errorMsg}
+                        </div>
+                    )}
+                    <button type="submit" disabled={isLoading}>
+                        {isLoading ? 'Creating...' : 'Create Group'}
+                    </button>
                 </form>
                 <div className={Mstyle.createLink}>
                     <p>Want to connect to a group? <Link href="/join">Click here!</Link></p>
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { useState } from "react";
 import UserProfile from '../../app/session/UserProfile';
 import { useRouter } from "next/navigation";
-import { getGroup, joinGroup, requestsConsent } from "@/lib/group";
 
 export default function join() {
   const router = useRouter();
   const [Email, setEmail] = useState({email: ""});
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState(null)
 
   const handleChange = (e) => {
     setEmail(prev => ({
@@ -19,26 +20,29 @@ export default function join() {
   };
 
   const handleJoin = async (e) => {
+    e?.preventDefault()
+    setErrorMsg(null)
+    setLoading(true)
     try {
-      console.log("User email: "+UserProfile.getEmail())
-      const joinSuccess = await joinGroup(UserProfile.getEmail(), Email.email);      
-      if (joinSuccess.success) {
-        const requestSuccess = await requestsConsent(UserProfile.getEmail(), Email.email, true)
-        
-        if(requestSuccess.success){ 
-          const group = await getGroup(requestSuccess.data)
+      const userEmail = UserProfile.getEmail()
+      if (!userEmail) throw new Error('No current user')
 
-          const groupData = group.success ? group.data : { group_id: null, group_name: null }
+      const joinRes = await fetch('/api/group/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail, adminEmail: Email.email })
+      }).then(r => r.json())
 
-          UserProfile.setGName(groupData.group_name);
+      if (!joinRes.success) throw new Error(joinRes.error || 'Join failed')
 
-          router.push('/mainPage')
-        } else throw new Error(requestSuccess.error)
-      } else{
-        throw new Error(joinSuccess.error)
-      }
+      setErrorMsg(null)
+      alert('Join request sent! Wait for admin approval.')
+      setEmail({ email: '' })
     } catch (error) {
-      console.error('Create failed:', error);
+      console.error('Join failed:', error)
+      setErrorMsg(error.message || 'Failed to send join request')
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -46,19 +50,22 @@ export default function join() {
     <div className={Mstyle.page}>
       <div className={Mstyle.main}>
         <h3>Connect to your group right now!</h3>
-        <form className={Mstyle.connForm}>
+        <form className={Mstyle.connForm} onSubmit={handleJoin} aria-live="polite">
             <div className={Mstyle.mail} >
               <input 
+                id="adminEmail"
                 placeholder="Type a connection e-mail" 
                 type="email"
                 name="email"
                 value={Email.email}
                 onChange={handleChange}
                 required
+                aria-required="true"
               />
               <img src="/icon/mail_Icon.png" alt="Mail Icon" className={Mstyle.mailIcon} />
             </div>
-            <Link href="/mainPage" onNavigate={(e) => {e.preventDefault(); handleJoin()}}><button type="submit">Connect</button></Link>
+            <button type="submit" disabled={loading}>{loading ? 'Connecting…' : 'Connect'}</button>
+            {errorMsg && <div role="alert" style={{color:'red'}}>{errorMsg}</div>}
         </form>
         <div className={Mstyle.createLink}>
           <p>Want to create a new group? <Link href="/create">Click here!</Link></p>

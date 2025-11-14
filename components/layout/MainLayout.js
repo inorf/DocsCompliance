@@ -11,12 +11,14 @@ const MainLayout = ({ children, userEmail }) => {
   useEffect(() => {
     const fetchGroupName = async () => {
       try {
-        const group = await getGroup(userEmail);
-        if (group.success) {
-          setGroupName(group.data.group_name);
-        } else {
-          setGroupName("No Group");
-        }
+        const res = await fetch('/api/group/get', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail })
+        })
+        const group = await res.json()
+        if (group.success) setGroupName(group.data.group_name || 'No Group')
+        else setGroupName('No Group')
       } catch (error) {
         console.error("Error fetching group:", error);
         setGroupName("Error");
