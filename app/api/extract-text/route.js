@@ -1,39 +1,55 @@
 import { NextResponse } from 'next/server'
 import textract from 'textract'
 import PDFParse from 'pdf-parse'
+import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
+
+async function getAdmin(){ return getSupabaseAdmin() }
 
 export async function POST(request) {
     try {
-        const { file_url, file_name, contId } = await request.json()
-        if (!file_url || !file_name || !contId) {
-            return NextResponse.json(
-                { success: false, error: 'File URL, file name and contract ID are required' }, 
-                { status: 400 }
-            )
+        const { file_name, contId } = await request.json()
+        if (!file_name || !contId) {
+            return NextResponse.json({ success: false, error: 'File name and contract ID are required' }, { status: 400 })
         }
 
         const fileExt = file_name.split('.').pop().toLowerCase()
         let text = ''
 
+        // Use server-side admin client to fetch contract metadata and file
+        const supabaseAdmin = await getAdmin()
+        const { data: contract, error: contractError } = await supabaseAdmin
+            .from('contracts')
+            .select('file_path, file_name')
+            .eq('cont_id', contId)
+            .single()
+
+        if (contractError) {
+            return NextResponse.json({ success: false, error: 'Contract not found' }, { status: 404 })
+        }
+
+        const filePath = contract.file_path
+        const storedName = contract.file_name || file_name
+
+        const { data: downloadData, error: downloadError } = await supabaseAdmin.storage.from('contracts').download(filePath)
+        if (downloadError || !downloadData) {
+            return NextResponse.json({ success: false, error: 'Failed to download file from storage' }, { status: 500 })
+        }
+
+        const arrayBuffer = await downloadData.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+
         if (fileExt === 'pdf') {
-            // Fetch PDF and parse it properly
-            const response = await fetch(file_url)
-            const buffer = await response.arrayBuffer()
-            const data = await PDFParse(Buffer.from(buffer))
+            const data = await PDFParse(buffer)
             text = data.text
         } else if (fileExt === 'docx' || fileExt === 'txt') {
-            // Use textract for docx and txt files
             text = await new Promise((resolve, reject) => {
-                textract.fromUrl(file_url, (error, extractedText) => {
+                textract.fromBufferWithName(buffer, storedName, (error, extractedText) => {
                     if (error) reject(error)
                     else resolve(extractedText)
                 })
             })
         } else {
-            return NextResponse.json(
-                { success: false, error: `Unsupported file type: ${fileExt}` }, 
-                { status: 400 }
-            )
+            return NextResponse.json({ success: false, error: `Unsupported file type: ${fileExt}` }, { status: 400 })
         }
 
         const extractedDates = extractDatesFromText(text)
