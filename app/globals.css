@@ -1,9 +1,4 @@
-/* app/globals.css — global styles and Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@import 'tw-animate-css';
+/* app/globals.css — global styles with CSS variables (no Tailwind) */
 
 :root {
   --background: #ffffff;
@@ -50,58 +45,176 @@
   --ring: #60a5fa;
 }
 
-@layer base {
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  :focus-visible {
-    outline: 3px solid var(--ring);
-    outline-offset: 2px;
-  }
+/* Base styles */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-@layer components {
-  .login-page { min-height: 100vh; display: flex; }
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  .login-page__left { width: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
 
-  /* Right panel: explicit dark styling */
-  .login-page__right {
-    display: none;
-    background-color: #000000; /* solid black */
-    color: #ffffff; /* white text */
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
+/* Login page layout */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+.login-page__left {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Right panel: explicit dark styling */
+.login-page__right {
+  display: none;
+  background-color: #000000;
+  color: #ffffff;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.login-page__right-content {
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Login form */
+.login-form {
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.login-form__title {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.login-form__welcome-heading {
+  font-size: 1.875rem;
+  font-weight: 600;
+}
+
+.login-form__welcome-text {
+  color: var(--muted-foreground);
+  font-size: 1.125rem;
+}
+
+.login-form__input {
+  width: 100%;
+  height: 3rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--input);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: var(--foreground);
+  transition: all 0.2s;
+}
+
+.login-form__input:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.login-form__input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.login-form__button {
+  width: 100%;
+  height: 3rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-form__button:hover {
+  opacity: 0.9;
+}
+
+.login-form__button:active {
+  transform: scale(0.98);
+}
+
+.login-form__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-form__mobile-info {
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  display: block;
+}
+
+.login-form__mobile-info-text {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.login-form__mobile-info-brand {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Info panel text (right side) */
+.info-panel__title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.info-panel__description {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+}
+
+.info-panel__copyright {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive: show right panel on desktop */
+@media (min-width: 1024px) {
+  .login-page__left {
+    width: 50%;
   }
 
-  .login-page__right-content { max-width: 28rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .login-page__right {
+    display: flex;
+    width: 50%;
+  }
 
-  .login-form { width: 100%; max-width: 28rem; display: flex; flex-direction: column; gap: 2rem; }
-
-  .login-form__title { font-size: 3rem; font-weight: 700; }
-  .login-form__welcome-heading { font-size: 1.875rem; font-weight: 600; }
-  .login-form__welcome-text { color: var(--muted-foreground); font-size: 1.125rem; }
-
-  .login-form__input { width: 100%; height: 3rem; padding: 0.75rem 1rem; background-color: var(--input); border: 1px solid var(--border); border-radius: 0.5rem; }
-
-  .login-form__button { width: 100%; height: 3rem; background-color: var(--primary); color: var(--primary-foreground); border-radius: 0.5rem; border: none; }
-
-  .login-form__mobile-info { padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--border); display: block; }
-
-  @media (min-width: 1024px) {
-    .login-page__left { width: 50%; }
-    .login-page__right { display: flex; width: 50%; }
-    .login-form__mobile-info { display: none; }
+  .login-form__mobile-info {
+    display: none;
   }
 }
