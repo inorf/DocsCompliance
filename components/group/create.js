@@ -50,7 +50,14 @@ export default function Create() {
     return (
         <div className={Mstyle.page}>
             <div className={Mstyle.main}>
-                <h3>Make your own group!</h3>
+                <div className={Mstyle.cardHeader}>
+                    <p className={Mstyle.kicker}>Create group</p>
+                    <h3>Launch your new workspace</h3>
+                    <p className={Mstyle.subtitle}>
+                        Give your team a memorable name so everyone can find it quickly.
+                        You can change it later from Settings.
+                    </p>
+                </div>
                 <form className={Mstyle.connForm} onSubmit={handleSubmit} aria-live="polite">
                     <div className={Mstyle.Uname}>
                         <input 
@@ -64,19 +71,21 @@ export default function Create() {
                             aria-required="true"
                             aria-invalid={errorMsg ? "true" : "false"}
                         />
-                        <img src="/icon/pen_Icon.png" alt="Pen Icon" className={Mstyle.penIcon} />
+                        <img src="/icon/pen_Icon.png" alt="Pen icon" className={Mstyle.penIcon} />
                     </div>
                     {errorMsg && (
-                        <div role="alert" style={{color:'red', marginTop: '10px', fontSize: '14px'}}>
+                        <div role="alert" className={Mstyle.statusMessage}>
                             {errorMsg}
                         </div>
                     )}
-                    <button type="submit" disabled={isLoading}>
+                    <button type="submit" className={Mstyle.submitButton} disabled={isLoading}>
                         {isLoading ? 'Creating...' : 'Create Group'}
                     </button>
                 </form>
                 <div className={Mstyle.createLink}>
-                    <p>Want to connect to a group? <Link href="/join">Click here!</Link></p>
+                    <p className={Mstyle.helperText}>
+                        Want to connect to a group? <Link href="/join">Request access</Link>
+                    </p>
                 </div>
             </div>
         </div>

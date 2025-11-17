@@ -49,9 +49,16 @@ export default function join() {
   return (
     <div className={Mstyle.page}>
       <div className={Mstyle.main}>
-        <h3>Connect to your group right now!</h3>
+        <div className={Mstyle.cardHeader}>
+          <p className={Mstyle.kicker}>Join group</p>
+          <h3>Send your request to the admin</h3>
+          <p className={Mstyle.subtitle}>
+            Enter the email address of the group administrator and we will notify
+            them instantly.
+          </p>
+        </div>
         <form className={Mstyle.connForm} onSubmit={handleJoin} aria-live="polite">
-            <div className={Mstyle.mail} >
+            <div className={Mstyle.mail}>
               <input 
                 id="adminEmail"
                 placeholder="Type a connection e-mail" 
@@ -62,13 +69,21 @@ export default function join() {
                 required
                 aria-required="true"
               />
-              <img src="/icon/mail_Icon.png" alt="Mail Icon" className={Mstyle.mailIcon} />
+              <img src="/icon/mail_Icon.png" alt="Mail icon" className={Mstyle.mailIcon} />
             </div>
-            <button type="submit" disabled={loading}>{loading ? 'Connecting…' : 'Connect'}</button>
-            {errorMsg && <div role="alert" style={{color:'red'}}>{errorMsg}</div>}
+            <button type="submit" className={Mstyle.submitButton} disabled={loading}>
+              {loading ? 'Sending request…' : 'Send request'}
+            </button>
+            {errorMsg && (
+              <div role="alert" className={Mstyle.statusMessage}>
+                {errorMsg}
+              </div>
+            )}
         </form>
         <div className={Mstyle.createLink}>
-          <p>Want to create a new group? <Link href="/create">Click here!</Link></p>
+          <p className={Mstyle.helperText}>
+            Want to create a new group? <Link href="/create">Start from scratch</Link>
+          </p>
         </div>
       </div>
     </div>
