@@ -1,32 +1,50 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 import UserProfile from '../../app/session/UserProfile';
 import Link from 'next/link';
 import "../styles/MainLayout.scss";
 // import { getGroup } from "../api/group";
 
 const MainLayout = ({ children, userEmail }) => {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [groupName, setGroupName] = useState("");
 
+  // Centralized auth check for pages that use MainLayout
   useEffect(() => {
-    const fetchGroupName = async () => {
+    const checkAuth = async () => {
+      const email = UserProfile.getEmail();
+      if (!email) {
+        router.push('/login');
+        return;
+      }
+
       try {
-        const res = await fetch('/api/group/get', {
+        const res = await fetch('/api/auth/check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userEmail })
-        })
-        const group = await res.json()
-        if (group.success) setGroupName(group.data.group_name || 'No Group')
-        else setGroupName('No Group')
+          body: JSON.stringify({ email }),
+        });
+
+        const authData = await res.json();
+        if (!authData.authenticated) {
+          router.push('/login');
+          return;
+        }
+
+        if (!authData.hasGroup) {
+          router.push('/join');
+          return;
+        }
       } catch (error) {
-        console.error("Error fetching group:", error);
-        setGroupName("Error");
+        console.error('Auth check failed (MainLayout):', error);
+        router.push('/login');
       }
     };
 
-    if (userEmail) fetchGroupName();
-  }, [userEmail]);
+    checkAuth();
+  }, [router]);
 
   return (
     <div className="layout">
