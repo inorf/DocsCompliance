@@ -35,85 +35,38 @@ export default function Calendar() {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
 
-  // Get storage key based on user email (session-based)
-  const getStorageKey = () => {
-    const email = UserProfile.getEmail();
-    return email ? `calendarEvents_${email}` : 'calendarEvents';
-  };
-
-  // Load events from localStorage (session-based, persists across refreshes)
-  const loadEvents = () => {
-    if (typeof window === 'undefined') return;
-    
-    const storageKey = getStorageKey();
-    const savedEvents = localStorage.getItem(storageKey);
-    
-    if (savedEvents) {
-      try {
-        const parsedEvents = JSON.parse(savedEvents);
-        setEvents(parsedEvents);
-      } catch (e) {
-        console.error('Error loading events from session:', e);
-        setEvents({});
-      }
-    } else {
-      setEvents({});
-    }
-  };
-
-  // Save events to localStorage whenever they change (session-based)
-  const saveEvents = (eventsToSave) => {
-    if (typeof window === 'undefined') return;
-    
-    const storageKey = getStorageKey();
-    if (storageKey && storageKey !== 'calendarEvents') {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(eventsToSave));
-      } catch (e) {
-        console.error('Error saving events to session:', e);
-      }
-    }
-  };
-
-  // Load events on mount and when user changes
+  // Load events from server when component mounts
   useEffect(() => {
-    loadEvents();
-
-    // Reload events when user email changes
-    const checkUserChange = () => {
+    let mounted = true;
+    async function fetchEvents() {
       const email = UserProfile.getEmail();
-      const lastEmail = localStorage.getItem('_lastCalendarEmail');
-      if (lastEmail !== email) {
-        localStorage.setItem('_lastCalendarEmail', email || '');
-        loadEvents();
+      if (!email) { if (mounted) setEvents({}); return; }
+      try {
+        const res = await fetch('/api/calendar-events/list', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const payload = await res.json();
+        if (!payload.success || !Array.isArray(payload.data)) {
+          if (mounted) setEvents({});
+          return;
+        }
+        const grouped = {};
+        for (const ev of payload.data) {
+          const d = new Date(ev.event_date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          if (!grouped[key]) grouped[key] = [];
+          grouped[key].push({ id: ev.event_id, name: ev.event_name, description: ev.event_description, color: ev.event_color, ...ev });
+        }
+        if (mounted) setEvents(grouped);
+      } catch (e) {
+        if (mounted) setEvents({});
       }
-    };
-
-    // Check every 2 seconds for user changes
-    const interval = setInterval(checkUserChange, 2000);
-
-    // Also listen for storage changes (when session is restored in another tab)
-    const handleStorageChange = (e) => {
-      if (e.key === getStorageKey() || e.key === '_lastCalendarEmail') {
-        loadEvents();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  // Save events to localStorage whenever they change
-  useEffect(() => {
-    // Only save if we have a valid storage key (user is logged in)
-    const storageKey = getStorageKey();
-    if (storageKey && storageKey !== 'calendarEvents') {
-      saveEvents(events);
     }
-  }, [events]);
+    fetchEvents();
+    return () => { mounted = false; };
+  }, []);
 
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
@@ -191,45 +144,69 @@ export default function Calendar() {
     setViewMode('month');
   };
 
-  const handleSaveEvent = (eventData) => {
+  const handleSaveEvent = async (eventData) => {
+    const email = UserProfile.getEmail();
+    if (!email) return;
     const key = formatDateKey(eventModal.date);
-    const updatedEvents = { ...events };
-    
-    if (eventModal.event && eventModal.event.id) {
-      // Update existing event
-      const eventIndex = updatedEvents[key]?.findIndex(e => e.id === eventModal.event.id);
-      if (eventIndex !== undefined && eventIndex !== -1) {
-        updatedEvents[key][eventIndex] = { ...eventModal.event, ...eventData };
+    try {
+      if (eventModal.event && eventModal.event.id) {
+        // Update
+        await fetch('/api/calendar-events/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, event_id: eventModal.event.id, update: { event_name: eventData.name, event_description: eventData.description, event_date: key, event_color: eventData.color } })
+        });
+      } else {
+        // Create
+        await fetch('/api/calendar-events/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, event: { event_name: eventData.name, event_description: eventData.description, event_date: key, event_color: eventData.color } })
+        });
       }
-    } else {
-      // Add new event
-      const newEvent = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        ...eventData
-      };
-      if (!updatedEvents[key]) {
-        updatedEvents[key] = [];
+      // refresh list
+      const res = await fetch('/api/calendar-events/list', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
+      });
+      const payload = await res.json();
+      if (payload.success && Array.isArray(payload.data)) {
+        const grouped = {};
+        for (const ev of payload.data) {
+          const d = new Date(ev.event_date);
+          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          if (!grouped[k]) grouped[k] = [];
+          grouped[k].push({ id: ev.event_id, name: ev.event_name, description: ev.event_description, color: ev.event_color, ...ev });
+        }
+        setEvents(grouped);
       }
-      updatedEvents[key].push(newEvent);
+      setEventModal({ open: false, date: null, event: null });
+    } catch (e) {
+      console.error('save event error', e);
     }
-
-    setEvents(updatedEvents);
-    setEventModal({ open: false, date: null, event: null });
   };
 
-  const handleDeleteEvent = (eventId) => {
-    const key = formatDateKey(eventModal.date);
-    const updatedEvents = { ...events };
-    
-    if (updatedEvents[key]) {
-      updatedEvents[key] = updatedEvents[key].filter(e => e.id !== eventId);
-      if (updatedEvents[key].length === 0) {
-        delete updatedEvents[key];
+  const handleDeleteEvent = async (eventId) => {
+    const email = UserProfile.getEmail();
+    if (!email) return;
+    try {
+      await fetch('/api/calendar-events/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, event_id: eventId }) });
+      // refresh
+      const res = await fetch('/api/calendar-events/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+      const payload = await res.json();
+      if (payload.success && Array.isArray(payload.data)) {
+        const grouped = {};
+        for (const ev of payload.data) {
+          const d = new Date(ev.event_date);
+          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          if (!grouped[k]) grouped[k] = [];
+          grouped[k].push({ id: ev.event_id, name: ev.event_name, description: ev.event_description, color: ev.event_color, ...ev });
+        }
+        setEvents(grouped);
       }
+      setEventModal({ open: false, date: null, event: null });
+    } catch (e) {
+      console.error('delete error', e);
     }
-
-    setEvents(updatedEvents);
-    setEventModal({ open: false, date: null, event: null });
   };
 
   const handleEventClick = (date, event) => {

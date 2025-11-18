@@ -397,6 +397,13 @@
   overflow-y: auto;
 }
 
+/* Center page-like children (settings, group pages) and give them a comfortable max-width */
+.content > .page,
+.content > .settings {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 @media (min-width: 1024px) {
   .layout {
     display: flex;
