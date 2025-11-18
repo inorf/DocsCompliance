@@ -1,22 +1,52 @@
+
+/* Default is dark-first */
 :root {
-  --layout-sidebar-bg: linear-gradient(180deg, #0d1830 0%, #13203a 60%, #111b33 100%);
-  --layout-sidebar-border: rgba(255, 255, 255, 0.08);
-  --layout-sidebar-text: rgba(255, 255, 255, 0.85);
-  --layout-sidebar-active: rgba(129, 140, 248, 0.35);
-  --layout-topbar-bg: rgba(255, 255, 255, 0.82);
-  --layout-topbar-border: rgba(15, 23, 42, 0.08);
-  --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
+  --layout-sidebar-bg: linear-gradient(180deg, #182543 0%, #1f2f54 45%, #162545 100%);
+  --layout-sidebar-border: rgba(148, 163, 184, 0.35);
+  --layout-sidebar-text: rgba(248, 250, 252, 0.92);
+  --layout-sidebar-active: rgba(59, 130, 246, 0.45);
+  --layout-topbar-bg: rgba(23, 32, 55, 0.88);
+  --layout-topbar-border: rgba(148, 163, 184, 0.35);
+  --layout-content-bg: linear-gradient(120deg, #121c33 0%, #1a253f 60%, #0c1324 100%);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Dark-mode color overrides (default) */
+.layout,
+.layout .content,
+.layout .content p,
+.layout .content h1,
+.layout .content h2,
+.layout .content h3,
+.layout .content h4 {
+  color: #f8fafc;
+}
+
+.layout .content span,
+.layout .content strong,
+.layout .content label {
+  color: #f1f5f9;
+}
+
+.topbar__breadcrumbs h1,
+.topbar__user strong {
+  color: #f8fafc;
+}
+
+.topbar__eyebrow,
+.topbar__user-label {
+  color: rgba(226, 232, 240, 0.7);
+}
+
+/* Provide the original light tokens & adjustments when user prefers light */
+@media (prefers-color-scheme: light) {
   :root {
-    --layout-sidebar-bg: linear-gradient(180deg, #182543 0%, #1f2f54 45%, #162545 100%);
-    --layout-sidebar-border: rgba(148, 163, 184, 0.35);
-    --layout-sidebar-text: rgba(248, 250, 252, 0.92);
-    --layout-sidebar-active: rgba(59, 130, 246, 0.45);
-    --layout-topbar-bg: rgba(23, 32, 55, 0.88);
-    --layout-topbar-border: rgba(148, 163, 184, 0.35);
-    --layout-content-bg: linear-gradient(120deg, #121c33 0%, #1a253f 60%, #0c1324 100%);
+    --layout-sidebar-bg: linear-gradient(180deg, #0d1830 0%, #13203a 60%, #111b33 100%);
+    --layout-sidebar-border: rgba(255, 255, 255, 0.08);
+    --layout-sidebar-text: rgba(255, 255, 255, 0.85);
+    --layout-sidebar-active: rgba(129, 140, 248, 0.35);
+    --layout-topbar-bg: rgba(255, 255, 255, 0.82);
+    --layout-topbar-border: rgba(15, 23, 42, 0.08);
+    --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
   }
 
   .layout,
@@ -26,23 +56,23 @@
   .layout .content h2,
   .layout .content h3,
   .layout .content h4 {
-    color: #f8fafc;
+    color: var(--foreground);
   }
 
   .layout .content span,
   .layout .content strong,
   .layout .content label {
-    color: #f1f5f9;
+    color: var(--muted-foreground);
   }
 
   .topbar__breadcrumbs h1,
   .topbar__user strong {
-    color: #f8fafc;
+    color: var(--foreground);
   }
 
   .topbar__eyebrow,
   .topbar__user-label {
-    color: rgba(226, 232, 240, 0.7);
+    color: var(--muted-foreground);
   }
 }
 
@@ -170,7 +200,8 @@
 .layout__main {
   flex: 1;
   margin-left: 0;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -240,6 +271,99 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
+}
+
+/* Profile popup (hover/focus) */
+.topbar__user {
+  position: relative; /* anchor for popup */
+}
+
+.profile-popup {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 8px;
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 220px;
+  z-index: 60;
+
+  /* start hidden */
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 160ms cubic-bezier(0.2, 0, 0, 1), transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.profile-popup--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-popup {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Popup content structure (matching main page panel/card tokens) */
+.profile-popup__row {
+  margin-bottom: 0.6rem;
+}
+
+.profile-popup__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted-foreground);
+  margin-bottom: 0.25rem;
+}
+
+.profile-popup__value {
+  font-weight: 600;
+  color: inherit;
+}
+
+.profile-popup__email {
+  word-break: break-all;
+  font-size: 0.95rem;
+  color: rgba(17,17,17,0.85);
+}
+
+.profile-popup__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+}
+
+.profile-popup__btn {
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-popup {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.16);
+    color: #e6eefc;
+  }
+
+  .profile-popup__btn {
+    background: rgba(148, 163, 184, 0.06);
+    border-color: rgba(148, 163, 184, 0.22);
+    color: #e6eefc;
+  }
 }
 
 .topbar__user-meta {
@@ -312,5 +436,45 @@
 
   .content {
     padding: 1.25rem;
+  }
+}
+
+/* Responsive - phones and very wide screens */
+@media (max-width: 600px) {
+  .sidebar {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .layout__main {
+    margin-left: 0;
+  }
+
+  .topbar {
+    padding: 1rem;
+  }
+
+  .menu-button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .sidebar {
+    padding: 2.5rem 2rem;
+  }
+
+  .topbar {
+    padding: 2rem 3rem;
+  }
+
+  .content {
+    padding: 3rem;
+    margin: 0 auto;
   }
 }

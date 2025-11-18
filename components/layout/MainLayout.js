@@ -68,12 +68,15 @@ const MainLayout = ({ children }) => {
 
   const [displayName, setDisplayName] = useState("Loading…");
   const [groupName, setGroupName] = useState("Workspace");
+  const [email, setEmail] = useState('—');
+  const [showProfile, setShowProfile] = useState(false);
 
   // Update display name and group name when profile changes
   useEffect(() => {
     const updateProfile = () => {
       setDisplayName(UserProfile.getName() || UserProfile.getEmail() || "Loading…");
       setGroupName(UserProfile.getGName() || "Workspace");
+      setEmail(UserProfile.getEmail() || '—');
     };
 
     // Initial update
@@ -186,7 +189,16 @@ const MainLayout = ({ children }) => {
             <h1>{groupName}</h1>
           </div>
 
-          <div className="topbar__user">
+          <div
+            className="topbar__user"
+            onMouseEnter={() => setShowProfile(true)}
+            onMouseLeave={() => setShowProfile(false)}
+            onFocus={() => setShowProfile(true)}
+            onBlur={() => setShowProfile(false)}
+            tabIndex={0}
+            aria-haspopup="true"
+            aria-expanded={showProfile}
+          >
             <div className="topbar__user-meta">
               <span className="topbar__user-label">Signed in as</span>
               <strong>{displayName}</strong>
@@ -198,6 +210,28 @@ const MainLayout = ({ children }) => {
                 .join("")
                 .slice(0, 2)
                 .toUpperCase()}
+            </div>
+
+            <div
+              className={`profile-popup ${showProfile ? 'profile-popup--visible' : ''}`}
+              role="dialog"
+              aria-label="User profile"
+              aria-hidden={!showProfile}
+            >
+                  <div className="profile-popup__row">
+                    <div className="profile-popup__label">Name</div>
+                    <div className="profile-popup__value">{displayName}</div>
+                  </div>
+
+                  <div className="profile-popup__row">
+                    <div className="profile-popup__label">Email</div>
+                    <div className="profile-popup__value profile-popup__email">{email}</div>
+                  </div>
+
+                  <div className="profile-popup__row">
+                    <div className="profile-popup__label">Group</div>
+                    <div className="profile-popup__value">{groupName}</div>
+                  </div>
             </div>
           </div>
         </header>

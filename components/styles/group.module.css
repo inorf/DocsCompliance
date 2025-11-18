@@ -1,14 +1,14 @@
-@media (prefers-color-scheme: dark) {
-  .page {
-    --group-page-bg: radial-gradient(circle at top, #182032 0%, #05070d 60%);
-    --group-card-bg: rgba(15, 23, 36, 0.8);
-    --group-border: rgba(148, 163, 184, 0.2);
-    --group-input-bg: rgba(0, 0, 0, 0.35);
-    --group-input-border: rgba(148, 163, 184, 0.4);
-    --group-text-muted: #cbd5f5;
-    --group-heading: #f8fafc;
-    --group-icon-filter: invert(1);
-  }
+
+/* Dark-first default variables for the group page */
+.page {
+  --group-page-bg: radial-gradient(circle at top, #182032 0%, #05070d 60%);
+  --group-card-bg: rgba(15, 23, 36, 0.8);
+  --group-border: rgba(148, 163, 184, 0.2);
+  --group-input-bg: rgba(0, 0, 0, 0.35);
+  --group-input-border: rgba(148, 163, 184, 0.4);
+  --group-text-muted: #cbd5f5;
+  --group-heading: #f8fafc;
+  --group-icon-filter: invert(1);
 }
 
 @media (prefers-color-scheme: light) {

@@ -1,28 +1,31 @@
 /* app/globals.css — global styles with CSS variables (no Tailwind) */
 
+
+/* Default (dark-first): make dark theme the base */
 :root {
-  --background: #ffffff;
-  --foreground: #0b1220;
-  --card: #f8fafc;
-  --card-foreground: #0b1220;
-  --popover: #ffffff;
-  --popover-foreground: #0b1220;
-  --primary: #0b1220;
+  --background: #0b1220;
+  --foreground: #ffffff;
+  --card: #0f1724;
+  --card-foreground: #ffffff;
+  --popover: #0b1220;
+  --popover-foreground: #ffffff;
+  --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0b1220;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #0b1220;
-  --accent-foreground: #ffffff;
+  --secondary: #0b1220;
+  --secondary-foreground: #ffffff;
+  --muted: #0b1220;
+  --muted-foreground: #9ca3af;
+  --accent: #ffffff;
+  --accent-foreground: #0b1220;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #e6eef0;
-  --input: #ffffff;
+  --border: #1f2937;
+  --input: #0b1220;
   --ring: #60a5fa;
   --radius: 0.75rem;
 }
 
+/* Keep a utility .dark class for manual toggling (same values as default) */
 .dark {
   --background: #0b1220;
   --foreground: #ffffff;
@@ -43,6 +46,32 @@
   --border: #1f2937;
   --input: #0b1220;
   --ring: #60a5fa;
+}
+
+/* Light theme: applied when user prefers light color scheme */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #0b1220;
+    --card: #f8fafc;
+    --card-foreground: #0b1220;
+    --popover: #ffffff;
+    --popover-foreground: #0b1220;
+    --primary: #0b1220;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0b1220;
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
+    --accent: #0b1220;
+    --accent-foreground: #ffffff;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: #e6eef0;
+    --input: #ffffff;
+    --ring: #60a5fa;
+    --radius: 0.75rem;
+  }
 }
 
 /* Base styles */

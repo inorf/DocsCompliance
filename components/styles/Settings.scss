@@ -22,6 +22,33 @@
 
   p {
     margin: 0;
+  }
+
+  /* Responsive - phones and wide screens for settings layout */
+  @media (max-width: 600px) {
+    .settings__grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .settings__hero {
+      padding: 1rem;
+    }
+
+    .settings-card {
+      padding: 1rem;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .settings__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .settings__hero {
+      padding: 2.25rem;
+    }
     color: var(--muted-foreground);
     max-width: 32rem;
   }
@@ -254,51 +281,129 @@
   font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-  .settings-card {
-    background: rgba(15, 23, 42, 0.85);
+
+/* Dark-first defaults (override light defaults) */
+.settings-card {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.option {
+  border-color: rgba(148, 163, 184, 0.2);
+
+  &.is-active {
+    background: rgba(59, 130, 246, 0.18);
+  }
+}
+
+.select {
+  select {
+    background: rgba(30, 41, 59, 0.8);
     border-color: rgba(148, 163, 184, 0.2);
+    color: #f8fafc;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+
+    &:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      background-color: rgba(59, 130, 246, 0.15);
+    }
+
+    option {
+      background: rgba(30, 41, 59, 0.95);
+      color: #f8fafc;
+    }
+  }
+}
+
+.settings-card--danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+@media (prefers-color-scheme: light) {
+  .settings-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(15, 23, 42, 0.08);
   }
 
   .option {
-    border-color: rgba(148, 163, 184, 0.2);
+    border-color: rgba(15, 23, 42, 0.1);
 
     &.is-active {
-      background: rgba(59, 130, 246, 0.18);
+      background: rgba(37, 99, 235, 0.08);
     }
   }
 
   .select {
     select {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(148, 163, 184, 0.2);
-      color: #f8fafc;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1rem;
+      background: white;
+      border-color: rgba(15, 23, 42, 0.1);
+      color: var(--foreground);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 
       &:hover {
-        border-color: rgba(59, 130, 246, 0.5);
-        background-color: rgba(59, 130, 246, 0.1);
+        border-color: rgba(37, 99, 235, 0.4);
+        background-color: rgba(37, 99, 235, 0.02);
       }
 
       &:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        background-color: rgba(59, 130, 246, 0.15);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        background-color: rgba(37, 99, 235, 0.04);
       }
 
       option {
-        background: rgba(30, 41, 59, 0.95);
-        color: #f8fafc;
+        background: white;
+        color: var(--foreground);
       }
     }
   }
 
   .settings-card--danger {
-    background: rgba(239, 68, 68, 0.12);
-    border-color: rgba(239, 68, 68, 0.45);
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+}
+
+/* Laptop-focused adjustments (medium/large laptops ~1024px–1399px) */
+@media (min-width: 1024px) and (max-width: 1399px) {
+  .settings__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .settings__hero {
+    /* make the hero a comfortable column on laptop screens */
+    padding: 2rem;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .settings__summary {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .settings-card {
+    padding: 1.25rem;
+  }
+
+  .option {
+    padding: 0.9rem 1.1rem;
+  }
+
+  .select select {
+    padding: 0.85rem 1rem;
   }
 }
 

@@ -1,0 +1,22 @@
+.contracts-page {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--foreground);
+}
+
+@media (max-width: 1399px) {
+  .contracts-page {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .contracts-page {
+    padding: 1rem;
+  }
+}
