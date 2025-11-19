@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import textract from 'textract'
-import PDFParse from 'pdf-parse'
+import * as PDFParse from 'pdf-parse'
 import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
 import { getSession } from '@/lib/session'
 

@@ -30,6 +30,7 @@ const MainLayout = ({ children }) => {
   // Centralized auth check for pages that use MainLayout
   useEffect(() => {
     const checkAuth = async () => {
+      if (!UserProfile.getEmail() || !UserProfile.getIsLoggedIn()) {
       setIsCheckingAuth(true);
       
       try {
@@ -72,6 +73,9 @@ const MainLayout = ({ children }) => {
       } finally {
         setIsCheckingAuth(false);
       }
+    } else {
+      setIsCheckingAuth(false);
+    }
     };
     
     checkAuth();

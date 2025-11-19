@@ -1,9 +1,9 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import "../styles/MainPage.scss";
-import UserProfile from "../../app/session/UserProfile";
-import Link from "next/link";
+'use client'
+import React, { useState, useEffect } from "react"
+import "../styles/MainPage.scss"
+//import UserProfile from "../../app/session/UserProfile"
+import Link from "next/link"
+import { useUserProfile } from '../context/UserProfileContext'
 
 const stats = [
   { label: "Active contracts", value: "24", change: "+2 last week" },
@@ -31,42 +31,21 @@ const documents = [
 ];
 
 export default function MainPage() {
-  const [displayName, setDisplayName] = useState("team");
-  const [groupName, setGroupName] = useState("your workspace");
-  const [isMounted, setIsMounted] = useState(false);
+  const { name, groupName, isLoaded } = useUserProfile();
+  //const [displayName, setDisplayName] = useState("team");
+  //const [groupName, setGroupName] = useState("your workspace");
+  //const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    // Only access localStorage on client side after mount
-    setIsMounted(true);
-    const updateProfile = () => {
-      setDisplayName(UserProfile.getName() || UserProfile.getEmail() || "team");
-      setGroupName(UserProfile.getGName() || "your workspace");
-    };
-
-    // Initial update
-    updateProfile();
-
-    // Listen for storage changes (when session is restored in another tab)
-    const handleStorageChange = () => {
-      updateProfile();
-    };
-    window.addEventListener('storage', handleStorageChange);
-
-    // Set up interval to check for profile changes (for when session is restored)
-    const interval = setInterval(updateProfile, 500);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="dashboard">
       <section className="dashboard__hero">
         <div>
           <p className="dashboard__eyebrow">Welcome back</p>
-          <h2>Good day, {displayName.split(" ")[0]}!</h2>
+          <h2>Good day, {name.split(" ")[0]}!</h2>
           <p>
             You have {stats[1].value} reviews waiting and {stats[2].value} contracts
             expiring soon. Stay ahead of the queue for {groupName}.
