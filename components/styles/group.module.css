@@ -195,3 +195,94 @@
     font-size: 0.95rem;
   }
 }
+
+.requestsSection {
+  margin-top: 2rem;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.requestsTitle {
+  margin-bottom: 1rem;
+  color: #495057;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.pendingRequest {
+  background: --group-page-bg;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.pendingInfo {
+  flex: 1;
+}
+
+.pendingInfo strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.pendingInfo p {
+  margin: 4px 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.requestDate {
+  font-size: 12px !important;
+  color: #868e96 !important;
+}
+
+.status {
+  font-weight: bold;
+  color: #fd7e14; /* Orange for pending status */
+}
+
+.status.accepted {
+  color: #28a745; /* Green for accepted */
+}
+
+.cancelButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.cancelButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.toggleRequests {
+  background: none;
+  border: 1px solid #007bff;
+  color: #007bff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.toggleRequests:hover {
+  background: #007bff;
+  color: white;
+}

@@ -11,12 +11,12 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { adminEmail, agree } = await request.json()
-    if (!adminEmail || typeof agree !== 'boolean') {
-      return NextResponse.json({ success: false, error: 'adminEmail and agree(boolean) are required' }, { status: 400 })
+    const { userEmail, agree } = await request.json()
+    if (!userEmail || typeof agree !== 'boolean') {
+      return NextResponse.json({ success: false, error: 'userEmail and agree(boolean) are required' }, { status: 400 })
     }
 
-    const result = await requestsConsent(user.email, adminEmail, agree)
+    const result = await requestsConsent(userEmail, user.email, agree)
     return NextResponse.json(result)
   } catch (error) {
     console.error('requestsConsent error:', error)
