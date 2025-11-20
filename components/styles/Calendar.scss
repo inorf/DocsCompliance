@@ -475,6 +475,14 @@
   }
 }
 
+.event-modal__status {
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
 .event-modal__form {
   padding: 1.5rem;
 }
@@ -679,6 +687,7 @@
 
   @media (prefers-color-scheme: dark) {
     background: rgba(23, 32, 55, 0.98);
+    color: #f8fafc;
     border-bottom-color: rgba(148, 163, 184, 0.2);
   }
 
