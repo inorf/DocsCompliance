@@ -39,7 +39,11 @@ export async function POST(request) {
         const storedName = contract.file_name || file_name
 
         const { data: downloadData, error: downloadError } = await supabaseAdmin.storage.from('contracts').download(filePath)
-        if (downloadError || !downloadData) {
+        if (downloadError) {
+            console.error('Storage download error:', downloadError)
+            return NextResponse.json({success: false, error: `File not found in storage: ${downloadError.message}`}, { status: 404 })
+    }
+        if (!downloadData) {
             return NextResponse.json({ success: false, error: 'Failed to download file from storage' }, { status: 500 })
         }
 
@@ -109,8 +113,8 @@ function extractDatesWithContext(text) {
                 const position = match.index;
                 
                 // Extract context between proper boundaries
-                const context = extractContextBetweenBoundaries(text, position);
-                const description = extractCleanDescription(text, position);
+                const description = extractContextBetweenBoundaries(text, position, 150);
+                const context = extractContextBetweenBoundaries(text, position, 80);
                 
                 datesWithContext.push({
                     date: dateStr,
@@ -128,50 +132,30 @@ function extractDatesWithContext(text) {
     }
 }
 
-function extractContextBetweenBoundaries(text, position) {
-    // Look for the previous sentence end
+function extractContextBetweenBoundaries(text, position, maxLength = 200) {
+    const boundaries = ['.', '!', '?', ';', '\n'];
+    
+    // Find start boundary
     let start = position;
-    while (start > 0) {
-        if (text[start] === '.' || text[start] === '\n') {
-            start = start + 1; // Start after the period/newline
+    while (start > 0 && (position - start) < maxLength/2) {
+        if (boundaries.includes(text[start])) {
+            start++;
             break;
         }
         start--;
     }
     start = Math.max(0, start);
     
-    // Look for the next sentence end
+    // Find end boundary  
     let end = position;
-    while (end < text.length) {
-        if (text[end] === '.' || text[end] === '\n') {
-            end = end + 1; // Include the period/newline
+    while (end < text.length && (end - position) < maxLength/2) {
+        if (boundaries.includes(text[end])) {
             break;
         }
         end++;
     }
     
-    const context = text.substring(start, end).trim();
-    
-    // Clean up - remove extra whitespace and normalize
-    return context.replace(/\s+/g, ' ').replace(/\n/g, ' ').trim();
-}
-
-function extractCleanDescription(text, position) {
-    // Try to get the full sentence first
-    const sentenceStart = findSentenceStart(text, position);
-    const sentenceEnd = findSentenceEnd(text, position);
-    
-    let description = text.substring(sentenceStart, sentenceEnd).trim();
-    
-    // If sentence is too long, try to get a clause around the date
-    if (description.length > 200) {
-        description = extractContextBetweenBoundaries(text, position);
-    }
-    
-    // Clean up whitespace
-    description = description.replace(/\s+/g, ' ').trim();
-    
-    return description;
+    return text.substring(start, end).trim().replace(/\s+/g, ' ');
 }
 
 function findSentenceStart(text, position) {

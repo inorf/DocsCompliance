@@ -284,7 +284,7 @@ export default function Calendar() {
     today.setHours(0, 0, 0, 0);
     
     return allEvents
-      .filter(event => event.date >= today)
+      //.filter(event => event.date >= today)
       .sort((a, b) => a.date - b.date);
   };
 
