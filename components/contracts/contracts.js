@@ -9,6 +9,7 @@ export default function Contracts() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [detail, setDetail] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -55,6 +56,26 @@ export default function Contracts() {
 
   function closeDetails() {
     setDetail(null);
+  }
+
+  async function handleDelete() {
+    if (!detail || !detail.cont_id) return;
+    if (!confirm('Delete this contract? This cannot be undone.')) return;
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/contracts/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cont_id: detail.cont_id }) });
+      const payload = await res.json();
+      if (!payload.success) throw new Error(payload.error || 'Failed to delete contract');
+
+      // remove from list and close
+      setContracts(list => list.filter(c => (c.cont_id || c.file_name) !== (detail.cont_id || detail.file_name)));
+      setDetail(null);
+    } catch (err) {
+      console.error('delete contract', err);
+      setError(err.message || 'Failed to delete contract');
+    } finally {
+      setDeleting(false);
+    }
   }
 
   function addMilestone() {
@@ -133,7 +154,6 @@ export default function Contracts() {
                 <div className="card-title">{(c.contracts_metadata && c.contracts_metadata.cont_name) || c.file_name}</div>
                 <div className="card-actions">
                   <button className="btn small" onClick={() => openDetails(c)}>Details…</button>
-                  <a className="btn small secondary" href={c.file_url} target="_blank" rel="noreferrer">Open</a>
                 </div>
               </div>
               <div className="card-meta">
@@ -160,10 +180,38 @@ export default function Contracts() {
               <div><strong>Start:</strong> {detail.contracts_metadata?.start_date || '—'}</div>
               <div><strong>End:</strong> {detail.contracts_metadata?.end_date || '—'}</div>
               <div><strong>Status:</strong> {detail.contracts_metadata?.status || '—'}</div>
-              <div><strong>Uploaded by:</strong> {detail.name} &lt;{detail.email}&gt;</div>
+              {
+                (() => {
+                  // API sometimes returns an object for name (e.g. { user_name })
+                  const uploaderName = typeof detail.name === 'string' ? detail.name : (detail.name && detail.name.user_name) ? detail.name.user_name : '—';
+                  const uploaderEmail = typeof detail.email === 'string' ? detail.email : (detail.email && detail.email.email) ? detail.email.email : '—';
+                  return <div><strong>Uploaded by:</strong> {uploaderName} &lt;{uploaderEmail}&gt;</div>
+                })()
+              }
               <div><strong>File:</strong> <a href={detail.file_url} target="_blank" rel="noreferrer">{detail.file_name}</a></div>
+
+              {detail.contracts_dates && detail.contracts_dates.length > 0 && (
+                <div style={{marginTop:12}}>
+                  <strong>Milestones</strong>
+                  <div className="milestones">
+                    {detail.contracts_dates.map((cd, idx) => {
+                      const d = cd.dates || cd;
+                      const assignedName = typeof d.name === 'string' ? d.name : (d.name && d.name.user_name) ? d.name.user_name : '—';
+                      const assignedEmail = typeof d.email === 'string' ? d.email : (d.email && d.email.email) ? d.email.email : '—';
+                      return (
+                        <div key={d.date_id || idx} className="milestone">
+                          <div className="milestone-title">{d.date_title || 'Untitled'}</div>
+                          <div className="milestone-meta">Due: {d.due_date || '—'} • Status: {d.status || '—'}</div>
+                          <div className="milestone-assigned">Assigned to: {assignedName} &lt;{assignedEmail}&gt;</div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="modalFooter">
+              <button className="btn danger" onClick={handleDelete} disabled={deleting}>{deleting ? 'Deleting…' : 'Delete contract'}</button>
               <button className="btn" onClick={closeDetails}>Close</button>
             </div>
           </div>

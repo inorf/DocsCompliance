@@ -4,16 +4,14 @@ import React, { useState, useEffect } from "react";
 import "../styles/ProfileCard.scss";
 import UserProfile from "../../app/session/UserProfile";
 
-const activity = [
-  { title: "Updated vendor profile", meta: "Today • 10:12" },
-  { title: "Signed SOC 2 addendum", meta: "Yesterday • 18:45" },
-  { title: "Shared playbook with finance", meta: "Tue • 09:20" },
-];
+// placeholder activity until we fetch real timeline
+
 
 export default function UserProfileCard() {
   const [name, setName] = useState("Unnamed member");
   const [email, setEmail] = useState("no-email@unknown.com");
   const [groupName, setGroupName] = useState("No group assigned");
+  const [timeline, setTimeline] = useState([]);
 
   useEffect(() => {
     const updateProfile = () => {
@@ -33,6 +31,23 @@ export default function UserProfileCard() {
 
     // Set up interval to check for profile changes (for when session is restored)
     const interval = setInterval(updateProfile, 500);
+
+    // fetch recent timeline (last 5 contract uploads)
+    const fetchTimeline = async () => {
+      try {
+        const userEmail = UserProfile.getEmail();
+        if (!userEmail) return;
+        const res = await fetch('/api/contracts/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: userEmail }) });
+        const payload = await res.json();
+        if (payload.success && Array.isArray(payload.data)) {
+          const items = payload.data.slice(0,5).map(c => ({ title: (c.contracts_metadata && c.contracts_metadata.cont_name) || c.file_name, meta: c.uploaded_at ? new Date(c.uploaded_at).toLocaleString() : '' }));
+          setTimeline(items);
+        }
+      } catch (e) {
+        console.error('fetchTimeline', e);
+      }
+    };
+    fetchTimeline();
 
     return () => {
       clearInterval(interval);
@@ -91,12 +106,16 @@ export default function UserProfileCard() {
         <article className="profile-card profile-card--activity">
           <h3>Recent activity</h3>
           <ul>
-            {activity.map((item) => (
-              <li key={item.title}>
-                <strong>{item.title}</strong>
-                <span>{item.meta}</span>
-              </li>
-            ))}
+            {timeline.length === 0 ? (
+              <li className="muted">No recent activity</li>
+            ) : (
+              timeline.map((item) => (
+                <li key={item.title}>
+                  <strong>{item.title}</strong>
+                  <span>{item.meta}</span>
+                </li>
+              ))
+            )}
           </ul>
         </article>
       </div>

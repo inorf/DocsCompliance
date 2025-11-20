@@ -6,32 +6,24 @@ import Link from "next/link"
 import { useUserProfile } from '../context/UserProfileContext'
 
 const stats = [
-  { label: "Active contracts", value: "24", change: "+2 last week" },
-  { label: "Pending reviews", value: "8", change: "-2 cases" },
-  { label: "Expiring soon", value: "5", change: "Next 30 days" },
+  { label: "Active contracts", value: "0", change: "+0 last week" },
+  { label: "Events", value: "0", change: "Upcoming" },
+  { label: "Expiring soon", value: "0", change: "Next 30 days" },
 ];
 
-const reminders = [
-  { title: "Vendor NDA refresh", due: "Tomorrow • 09:00", type: "legal" },
-  { title: "SOC 2 audit prep", due: "Thu • 13:00", type: "security" },
-  { title: "HR policy review", due: "Mon • 15:30", type: "policy" },
-];
-
-const timeline = [
-  { time: "09:24", description: "Uploaded renewal contract for Globex" },
-  { time: "11:02", description: "Requested signature from FinPay legal" },
-  { time: "14:16", description: "Compliance check passed for vendor pack" },
-  { time: "16:40", description: "Flagged clause mismatch on ACME draft" },
-];
-
-const documents = [
-  { name: "ACME Procurement", status: "Draft", owner: "A. Hopkins" },
-  { name: "Globex Security Addendum", status: "In review", owner: "R. Patel" },
-  { name: "Q1 Vendor Audit", status: "Signed", owner: "M. Turner" },
-];
+// placeholders until data loads
+const emptyReminders = [];
+const emptyTimeline = [];
+const emptyDocuments = [];
 
 export default function MainPage() {
-  const { name, groupName, isLoaded } = useUserProfile();
+  const { name, groupName, isLoaded, email } = useUserProfile();
+  const [contracts, setContracts] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [docs, setDocs] = useState([]);
+  const [activeCount, setActiveCount] = useState(0);
+  const [expiringCount, setExpiringCount] = useState(0);
+  const [addedLastWeek, setAddedLastWeek] = useState(0);
   //const [displayName, setDisplayName] = useState("team");
   //const [groupName, setGroupName] = useState("your workspace");
   //const [isMounted, setIsMounted] = useState(false);
@@ -40,6 +32,61 @@ export default function MainPage() {
     return <div>Loading...</div>;
   }
 
+  useEffect(() => {
+    if (!email) return;
+
+    async function loadData() {
+      try {
+        const cRes = await fetch('/api/contracts/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const cPayload = await cRes.json();
+        const cData = (cPayload.success && Array.isArray(cPayload.data)) ? cPayload.data : [];
+        setContracts(cData);
+
+        // compute active
+        const active = cData.filter(c => c.contracts_metadata && c.contracts_metadata.status === 'active').length;
+        setActiveCount(active);
+
+        // compute expiring soon (end_date within 30 days)
+        const now = new Date();
+        const in30 = new Date(); in30.setDate(now.getDate() + 30);
+        const expiring = cData.filter(c => {
+          const ed = c.contracts_metadata?.end_date;
+          if (!ed) return false;
+          const d = new Date(ed);
+          return d >= now && d <= in30;
+        }).length;
+        setExpiringCount(expiring);
+
+        // documents (PDFs)
+        const pdfs = cData.filter(c => c.file_url && (c.file_name || '').toLowerCase().endsWith('.pdf'))
+                          .map(c => ({ name: c.contracts_metadata?.cont_name || c.file_name, url: c.file_url }));
+        setDocs(pdfs);
+
+        // added last week
+        const oneWeekAgo = new Date(); oneWeekAgo.setDate(now.getDate() - 7);
+        const added = cData.filter(c => {
+          if (!c.uploaded_at) return false;
+          const u = new Date(c.uploaded_at);
+          return u >= oneWeekAgo && u <= now;
+        }).length;
+        setAddedLastWeek(added);
+
+        // fetch calendar events (dates)
+        const dRes = await fetch('/api/dates/list', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+        const dPayload = await dRes.json();
+        const dData = (dPayload.success && Array.isArray(dPayload.data)) ? dPayload.data : [];
+        // show next few upcoming events
+        const upcoming = dData.filter(ev => ev.due_date).sort((a,b)=> new Date(a.due_date) - new Date(b.due_date)).slice(0,5);
+        setEvents(upcoming);
+
+      } catch (e) {
+        console.error('loadData', e);
+      }
+    }
+
+    loadData();
+  }, [email]);
+
   return (
     <div className="dashboard">
       <section className="dashboard__hero">
@@ -47,27 +94,31 @@ export default function MainPage() {
           <p className="dashboard__eyebrow">Welcome back</p>
           <h2>Good day, {name.split(" ")[0]}!</h2>
           <p>
-            You have {stats[1].value} reviews waiting and {stats[2].value} contracts
-            expiring soon. Stay ahead of the queue for {groupName}.
+            You have {events.length} upcoming events and {expiringCount} contracts expiring soon. {addedLastWeek} contracts added last week for {groupName}.
           </p>
         </div>
         <div className="dashboard__cta">
-          <button type="button" className="primary">Upload contract</button>
+          <Link href="/contracts"><button type="button" className="primary">Upload contract</button></Link>
           <button type="button" className="secondary">Schedule briefing</button>
         </div>
       </section>
 
       <section className="dashboard__stats">
-        {stats.map((item) => (
-          <article key={item.label} className="stat-card">
-            <p className="stat-card__label">{item.label}</p>
-            <div className="stat-card__value">
-              <span>{item.value}</span>
-              {item.suffix && <small>{item.suffix}</small>}
-            </div>
-            <p className="stat-card__meta">{item.change}</p>
-          </article>
-        ))}
+        <article className="stat-card">
+          <p className="stat-card__label">Active contracts</p>
+          <div className="stat-card__value"><span>{activeCount}</span></div>
+          <p className="stat-card__meta">All active contracts</p>
+        </article>
+        <article className="stat-card">
+          <p className="stat-card__label">Events</p>
+          <div className="stat-card__value"><span>{events.length}</span></div>
+          <p className="stat-card__meta">Upcoming deadlines</p>
+        </article>
+        <article className="stat-card">
+          <p className="stat-card__label">Expiring soon</p>
+          <div className="stat-card__value"><span>{expiringCount}</span></div>
+          <p className="stat-card__meta">Ending in next 30 days</p>
+        </article>
       </section>
 
       <section className="dashboard__grid">
@@ -83,14 +134,14 @@ export default function MainPage() {
           </header>
 
           <ul className="reminders">
-            {reminders.map((item) => (
-              <li key={item.title}>
+            {events.length === 0 ? <li className="muted">No upcoming events</li> : events.slice(0,4).map(ev => (
+              <li key={ev.date_id || ev.due_date}>
                 <div>
-                  <strong>{item.title}</strong>
-                  <span>{item.due}</span>
+                  <strong>{ev.date_title || ev.date_details || 'Event'}</strong>
+                  <span>{new Date(ev.due_date).toLocaleDateString()}</span>
                 </div>
-                <span className={`reminders__pill reminders__pill--${item.type}`}>
-                  {item.type}
+                <span className={`reminders__pill reminders__pill--${ev.type || 'event'}`}>
+                  {ev.status || 'pending'}
                 </span>
               </li>
             ))}
@@ -103,42 +154,49 @@ export default function MainPage() {
               <p className="panel__eyebrow">Recent activity</p>
               <h3>Timeline</h3>
             </div>
-            <button type="button">See all</button>
           </header>
 
           <ul className="timeline">
-            {timeline.map((item) => (
-              <li key={item.time}>
-                <span>{item.time}</span>
-                <p>{item.description}</p>
+            {contracts.slice(0,5).map((c) => (
+              <li key={c.cont_id || c.file_name}>
+                <span>{c.uploaded_at ? new Date(c.uploaded_at).toLocaleTimeString() : ''}</span>
+                <p>{(c.contracts_metadata && c.contracts_metadata.cont_name) || c.file_name}</p>
               </li>
             ))}
           </ul>
         </article>
 
+        {/* Center panel: Expiring soon */}
         <article className="dashboard__panel">
           <header>
             <div>
-              <p className="panel__eyebrow">In progress</p>
-              <h3>Documents</h3>
+              <p className="panel__eyebrow">Focus</p>
+              <h3>Expiring soon</h3>
             </div>
-            <button type="button">New record</button>
           </header>
 
           <div className="documents">
-            {documents.map((doc) => (
-              <div key={doc.name} className="documents__row">
+            {contracts.filter(c => {
+              const ed = c.contracts_metadata?.end_date;
+              if (!ed) return false;
+              const now = new Date();
+              const in30 = new Date(); in30.setDate(now.getDate() + 30);
+              const d = new Date(ed);
+              return d >= now && d <= in30;
+            }).slice(0,5).map(c => (
+              <div key={c.cont_id || c.file_name} className="documents__row">
                 <div>
-                  <strong>{doc.name}</strong>
-                  <span>{doc.owner}</span>
+                  <strong>{(c.contracts_metadata && c.contracts_metadata.cont_name) || c.file_name}</strong>{' '}
+                  <span>Ends: {c.contracts_metadata?.end_date || '—'}</span>
                 </div>
-                <span className={`status status--${doc.status.replace(" ", "-").toLowerCase()}`}>
-                  {doc.status}
-                </span>
+                <a className="btn small secondary" href={c.file_url} target="_blank" rel="noreferrer">Open</a>
               </div>
             ))}
+            {contracts.filter(c => c.contracts_metadata && c.contracts_metadata.end_date).length === 0 && <div className="empty">No expiring contracts</div>}
           </div>
         </article>
+
+        {/* Upcoming deadlines panel removed per request */}
       </section>
     </div>
   );

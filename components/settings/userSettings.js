@@ -47,7 +47,15 @@ export default function UserSettings() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setMessage("Preferences updated");
+    // persist toggles and themePreference to localStorage
+    try {
+      localStorage.setItem('docscompliance_toggles', JSON.stringify(toggles));
+      // themePreference already stored elsewhere
+      setMessage("Preferences updated");
+    } catch (e) {
+      console.error('save settings', e);
+      setMessage('Failed to save preferences');
+    }
     setTimeout(() => setMessage(null), 2000);
   };
 
@@ -57,6 +65,11 @@ export default function UserSettings() {
       const stored = localStorage.getItem('docscompliance_theme');
       if (stored === 'light' || stored === 'dark' || stored === 'system') {
         setThemePreference(stored);
+      }
+      // load toggles
+      const storedToggles = localStorage.getItem('docscompliance_toggles');
+      if (storedToggles) {
+        try { setToggles(JSON.parse(storedToggles)); } catch(e){}
       }
     } catch (e) {
       // ignore
@@ -68,6 +81,9 @@ export default function UserSettings() {
         if (val === 'light' || val === 'dark' || val === 'system') {
           setThemePreference(val);
         }
+      }
+      if (e.key === 'docscompliance_toggles') {
+        try { setToggles(JSON.parse(e.newValue)); } catch(e){}
       }
     };
     window.addEventListener('storage', onStorage);
@@ -212,22 +228,7 @@ export default function UserSettings() {
           </ul>
         </article>
 
-        <article className="settings-card">
-          <header>
-            <h3>Locale</h3>
-            <p>Set when reminders hit your inbox.</p>
-          </header>
-
-          <label className="select">
-            <span>Timezone</span>
-            <select value={timezone} onChange={(e) => setTimezone(e.target.value)}>
-              <option value="UTC">UTC</option>
-              <option value="EST">EST (GMT-5)</option>
-              <option value="PST">PST (GMT-8)</option>
-              <option value="CET">CET (GMT+1)</option>
-            </select>
-          </label>
-        </article>
+        {/* Locale block removed - timezone handling deprecated. */}
 
         <article className="settings-card settings-card--danger">
           <header>
