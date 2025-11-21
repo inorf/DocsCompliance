@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { updateDate } from '../../../../lib/dates'
+import { updateDate, normalizeDeadlineDays } from '@/lib/dates'
 import { getSession } from '@/lib/session'
-import { normalizeDeadlineDays } from '../../../../lib/calendarDefaults'
 
 export async function POST(request) {
   try {

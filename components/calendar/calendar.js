@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Calendar.scss';
 import UserProfile from '../../app/session/UserProfile';
-import { CALENDAR_DEFAULT_DEADLINE_DAYS, normalizeDeadlineDays } from '@/lib/calendarDefaults';
+import { normalizeDeadlineDays } from '@/lib/dates';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -194,7 +194,7 @@ export default function Calendar() {
     const key = formatDateKey(eventModal.date);
     const existingDeadline = eventModal.event?.deadline_days;
     const deadlineDays = normalizeDeadlineDays(
-      eventData.deadline_days ?? existingDeadline ?? CALENDAR_DEFAULT_DEADLINE_DAYS
+      eventData.deadline_days ?? existingDeadline ?? 7
     );
     const assignedTarget = (isAdmin ? eventData.assigned_to : email) || email;
     
@@ -448,7 +448,7 @@ function EventModal({ date, event, onSave, onDelete, onClose, currentUserEmail, 
   const [name, setName] = useState(event?.name || '');
   const [description, setDescription] = useState(event?.description || '');
   const [assigned_to, setAssignedTo] = useState(event?.assigned_to || currentUserEmail || '');
-  const [deadline_days, setDeadlineDays] = useState(event?.deadline_days || CALENDAR_DEFAULT_DEADLINE_DAYS);
+  const [deadline_days, setDeadlineDays] = useState(event?.deadline_days || 7);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -459,7 +459,7 @@ function EventModal({ date, event, onSave, onDelete, onClose, currentUserEmail, 
       name: name.trim(),
       description: description.trim(),
       assigned_to: normalizedAssigned,
-      deadline_days: parseInt(deadline_days, 10) || CALENDAR_DEFAULT_DEADLINE_DAYS
+      deadline_days: parseInt(deadline_days, 10) || 7
     });
   };
 
