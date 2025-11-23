@@ -3,17 +3,17 @@
   flex-direction: column;
   gap: 1.5rem;
   color: var(--foreground);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
 .settings__hero {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1.25rem;
   padding: 1.75rem;
   border-radius: 1.5rem;
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(59, 130, 246, 0.12));
   border: 1px solid rgba(59, 130, 246, 0.25);
+  text-align: center;
 
   h2 {
     margin: 0.25rem 0;
@@ -22,35 +22,7 @@
 
   p {
     margin: 0;
-  }
-
-  /* Responsive - phones and wide screens for settings layout */
-  @media (max-width: 600px) {
-    .settings__grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .settings__hero {
-      padding: 1rem;
-    }
-
-    .settings-card {
-      padding: 1rem;
-    }
-  }
-
-  @media (min-width: 1400px) {
-    .settings__grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-
-    .settings__hero {
-      padding: 2.25rem;
-    }
     color: var(--muted-foreground);
-    max-width: 32rem;
   }
 }
 
@@ -62,34 +34,17 @@
   margin: 0;
 }
 
-.settings__summary {
+.settings__grid {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 0.15rem;
-  color: var(--foreground);
-
-  small {
-    color: var(--muted-foreground);
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: 0.65rem;
-  }
-}
-
-.settings__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.25rem;
 }
 
 .settings-card {
   border-radius: 1.25rem;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--border);
   padding: 1.4rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(18px);
+  background: var(--card);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -118,7 +73,7 @@
   gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 
@@ -137,273 +92,27 @@
   }
 }
 
-.toggle-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  strong {
-    display: block;
-  }
-
-  span {
-    color: var(--muted-foreground);
-    font-size: 0.85rem;
-  }
-}
-
-.toggle {
-  width: 3rem;
-  height: 1.6rem;
-  border-radius: 1rem;
-  border: none;
-  background: rgba(148, 163, 184, 0.45);
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  span {
-    position: absolute;
-    width: 1.2rem;
-    height: 1.2rem;
-    border-radius: 50%;
-    background: white;
-    top: 50%;
-    left: 0.2rem;
-    transform: translateY(-50%);
-    transition: transform 0.2s;
-  }
-
-  &.is-on {
-    background: #22c55e;
-
-    span {
-      transform: translate(1.2rem, -50%);
-    }
-  }
-}
-
-.select {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  span {
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--muted-foreground);
-  }
-
-  select {
-    padding: 0.85rem 1rem;
-    padding-right: 2.5rem;
-    border-radius: 0.9rem;
-    border: 1px solid rgba(15, 23, 42, 0.1);
-    background: white;
-    font-size: 0.95rem;
-    font-family: inherit;
-    color: var(--foreground);
-    cursor: pointer;
-    transition: all 0.2s;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-
-    &:hover {
-      border-color: rgba(37, 99, 235, 0.4);
-      background-color: rgba(37, 99, 235, 0.02);
-    }
-
-    &:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      background-color: rgba(37, 99, 235, 0.04);
-    }
-
-    option {
-      padding: 0.5rem;
-      background: white;
-      color: var(--foreground);
-    }
-  }
-}
-
-.settings-card--danger {
-  background: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.35);
-
-  .danger {
-    padding: 0.9rem 1.2rem;
-    border-radius: 1rem;
-    border: none;
-    background: #ef4444;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-  }
-}
-
-.settings__actions {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.settings__actions .primary {
-  padding: 0.9rem 1.6rem;
-  border-radius: 1rem;
-  border: none;
-  background: linear-gradient(120deg, #2563eb, #7c3aed);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .settings__message {
   color: #16a34a;
   font-weight: 600;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
-
-/* Dark-first defaults (override light defaults) */
-.settings-card {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(148, 163, 184, 0.2);
-}
-
-.option {
-  border-color: rgba(148, 163, 184, 0.2);
-
-  &.is-active {
-    background: rgba(59, 130, 246, 0.18);
+/* Responsive */
+@media (max-width: 600px) {
+  .settings {
+    padding: 0.5rem;
   }
-}
-
-.select {
-  select {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(148, 163, 184, 0.2);
-    color: #f8fafc;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-
-    &:hover {
-      border-color: rgba(59, 130, 246, 0.5);
-      background-color: rgba(59, 130, 246, 0.1);
-    }
-
-    &:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-      background-color: rgba(59, 130, 246, 0.15);
-    }
-
-    option {
-      background: rgba(30, 41, 59, 0.95);
-      color: #f8fafc;
-    }
-  }
-}
-
-.settings-card--danger {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.45);
-}
-
-@media (prefers-color-scheme: light) {
-  .settings-card {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(15, 23, 42, 0.08);
-  }
-
-  .option {
-    border-color: rgba(15, 23, 42, 0.1);
-
-    &.is-active {
-      background: rgba(37, 99, 235, 0.08);
-    }
-  }
-
-  .select {
-    select {
-      background: white;
-      border-color: rgba(15, 23, 42, 0.1);
-      color: var(--foreground);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-
-      &:hover {
-        border-color: rgba(37, 99, 235, 0.4);
-        background-color: rgba(37, 99, 235, 0.02);
-      }
-
-      &:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        background-color: rgba(37, 99, 235, 0.04);
-      }
-
-      option {
-        background: white;
-        color: var(--foreground);
-      }
-    }
-  }
-
-  .settings-card--danger {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.35);
-  }
-}
-
-/* Laptop-focused adjustments (medium/large laptops ~1024px–1399px) */
-@media (min-width: 1024px) and (max-width: 1399px) {
-  .settings__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-  }
-
+  
   .settings__hero {
-    /* make the hero a comfortable column on laptop screens */
-    padding: 2rem;
-    max-width: 1100px;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 1rem;
   }
-
-  .settings__summary {
-    align-items: flex-end;
-    text-align: right;
-  }
-
+  
   .settings-card {
-    padding: 1.25rem;
-  }
-
-  .option {
-    padding: 0.9rem 1.1rem;
-  }
-
-  .select select {
-    padding: 0.85rem 1rem;
+    padding: 1rem;
   }
 }
-
