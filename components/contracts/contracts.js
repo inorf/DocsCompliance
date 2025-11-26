@@ -20,6 +20,12 @@ export default function Contracts() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [milestones, setMilestones] = useState([]);
+  
+  // extracted dates state
+  const [extractedDates, setExtractedDates] = useState([]);
+  const [extractingDates, setExtractingDates] = useState(false);
+  const [selectedExtractedDates, setSelectedExtractedDates] = useState(new Set());
+  const [preUploadedContId, setPreUploadedContId] = useState(null);
 
   useEffect(() => {
     const email = UserProfile.getEmail();
@@ -56,6 +62,107 @@ export default function Contracts() {
 
   function closeDetails() {
     setDetail(null);
+  }
+
+  async function handleFileSelection(e) {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    
+    setFile(selectedFile);
+    setExtractedDates([]);
+    setSelectedExtractedDates(new Set());
+    setError('');
+    
+    // Extract dates from the file asynchronously
+    await extractDatesFromFile(selectedFile);
+  }
+
+  async function extractDatesFromFile(selectedFile) {
+    try {
+      setExtractingDates(true);
+      
+      // First, we need to upload the file to get cont_id, then extract dates
+      // For now, we'll create a temporary container to hold file data for extraction
+      const email = UserProfile.getEmail();
+      if (!email) {
+        setError('User email not found');
+        return;
+      }
+
+      // Create FormData for file upload
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+      fd.append('email', email);
+
+      // Upload file first to get cont_id
+      const uploadRes = await fetch('/api/contracts/upload', { 
+        method: 'POST', 
+        body: fd 
+      });
+      const uploadPayload = await uploadRes.json();
+      
+      if (!uploadPayload.success) {
+        setError(`Upload failed: ${uploadPayload.error}`);
+        return;
+      }
+
+      const cont_id = uploadPayload.cont_id;
+      setPreUploadedContId(cont_id);
+
+      // Now extract dates using the uploaded file
+      const extractRes = await fetch('/api/extract-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          file_name: selectedFile.name,
+          contId: cont_id
+        })
+      });
+
+      const extractPayload = await extractRes.json();
+
+      if (!extractPayload.success) {
+        // If extraction failed but it's not a server error, allow manual entry
+        if (extractPayload.warning) {
+          console.warn('Extraction warning:', extractPayload.warning);
+        } else {
+          setError(`Failed to extract dates: ${extractPayload.error}`);
+          return;
+        }
+      }
+
+      // Store extracted dates (may be empty if extraction failed)
+      setExtractedDates(extractPayload.extracted_dates || []);
+      
+      // Show warning if provided
+      if (extractPayload.warning) {
+        console.log('Date extraction warning:', extractPayload.warning);
+      }
+      
+      // Pre-select all extracted dates by default
+      if (extractPayload.extracted_dates && extractPayload.extracted_dates.length > 0) {
+        const allIndices = new Set(extractPayload.extracted_dates.map((_, idx) => idx));
+        setSelectedExtractedDates(allIndices);
+      }
+
+    } catch (err) {
+      console.error('Date extraction error:', err);
+      setError(`Error extracting dates: ${err.message}`);
+    } finally {
+      setExtractingDates(false);
+    }
+  }
+
+  function toggleExtractedDate(index) {
+    setSelectedExtractedDates(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   }
 
   async function handleDelete() {
@@ -95,16 +202,22 @@ export default function Contracts() {
     setUploading(true);
     setError('');
     try {
-      // step 1: upload file (form-data)
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('email', email);
+      let cont_id = preUploadedContId;
+      
+      // If we have a pre-extracted cont_id from file selection, use it
+      // Otherwise upload now
+      if (!cont_id) {
+        // step 1: upload file (form-data)
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('email', email);
 
-      const r1 = await fetch('/api/contracts/upload', { method: 'POST', body: fd });
-      const p1 = await r1.json();
-      if (!p1.success) throw new Error(p1.error || 'Upload failed');
+        const r1 = await fetch('/api/contracts/upload', { method: 'POST', body: fd });
+        const p1 = await r1.json();
+        if (!p1.success) throw new Error(p1.error || 'Upload failed');
 
-      const cont_id = p1.cont_id;
+        cont_id = p1.cont_id;
+      }
 
       // step 2: set metadata
       const metadata = { cont_name: contName, cont_details: contDetails, start_date: startDate || null, end_date: endDate || null, status: 'active' };
@@ -112,10 +225,30 @@ export default function Contracts() {
       const p2 = await r2.json();
       if (!p2.success) throw new Error(p2.error || 'Failed to set metadata');
 
-      // step 3: optional create dates (milestones)
-      if (milestones.length > 0) {
+      // step 3: combine manual milestones with selected extracted dates
+      const allMilestones = [...milestones];
+      
+      // Add selected extracted dates as milestones
+      selectedExtractedDates.forEach(index => {
+        const extracted = extractedDates[index];
+        if (extracted) {
+          allMilestones.push({
+            date_title: extracted.date,
+            due_date: extracted.date,
+            assigned_to: email,
+            date_details: extracted.description
+          });
+        }
+      });
+
+      if (allMilestones.length > 0) {
         // normalize milestones to expected shape
-        const datesPayload = milestones.map(m => ({ date_title: m.date_title || 'Milestone', due_date: m.due_date, assigned_to: m.assigned_to || email }));
+        const datesPayload = allMilestones.map(m => ({ 
+          date_title: m.date_title || 'Milestone', 
+          due_date: m.due_date, 
+          assigned_to: m.assigned_to || email,
+          date_details: m.date_details || ''
+        }));
         const r3 = await fetch('/api/contracts/create-dates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, cont_id, dates: datesPayload }) });
         const p3 = await r3.json();
         if (!p3.success) throw new Error(p3.error || 'Failed to create contract dates');
@@ -125,6 +258,9 @@ export default function Contracts() {
       await fetchList(email);
       // reset and close
       setFile(null); setContName(''); setContDetails(''); setStartDate(''); setEndDate(''); setMilestones([]);
+      setExtractedDates([]);
+      setSelectedExtractedDates(new Set());
+      setPreUploadedContId(null);
       setShowUpload(false);
     } catch (err) {
       console.error('upload', err);
@@ -223,7 +359,19 @@ export default function Contracts() {
           <div className="modal small">
             <div className="modalHeader">
               <h3>Upload contract</h3>
-              <button className="close" onClick={() => setShowUpload(false)}>×</button>
+              <button className="close" onClick={() => {
+                setShowUpload(false);
+                setFile(null);
+                setContName('');
+                setContDetails('');
+                setStartDate('');
+                setEndDate('');
+                setMilestones([]);
+                setExtractedDates([]);
+                setSelectedExtractedDates(new Set());
+                setPreUploadedContId(null);
+                setError('');
+              }}>×</button>
             </div>
             <form onSubmit={handleUpload} className="modalBody">
               <label className="field">
@@ -248,11 +396,34 @@ export default function Contracts() {
               </div>
 
               <div className="field">
-                <div className="label">Upload PDF / DOCX</div>
-                <input type="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" onChange={e => setFile(e.target.files[0])} />
+                <div className="label">Upload PDF / DOCX / TXT</div>
+                <input type="file" accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" onChange={handleFileSelection} disabled={extractingDates} />
               </div>
 
-              <div className="label">Milestones (optional)</div>
+              {extractingDates && (
+                <div className="field" style={{padding:'8px', backgroundColor:'rgba(37, 99, 235, 0.1)', borderRadius:'6px'}}>
+                  <div style={{fontSize:'0.9rem', color:'#2563eb'}}>Scanning document for dates...</div>
+                </div>
+              )}
+
+              {extractedDates.length > 0 && (
+                <div className="field">
+                  <div className="label">Dates found in document ({extractedDates.length})</div>
+                  <div style={{display:'flex', flexDirection:'column', gap:'8px', maxHeight:'200px', overflowY:'auto', padding:'8px', backgroundColor:'rgba(0,0,0,0.02)', borderRadius:'6px'}}>
+                    {extractedDates.map((date, idx) => (
+                      <label key={idx} style={{display:'flex', gap:'8px', alignItems:'flex-start', padding:'6px', cursor:'pointer', borderRadius:'4px', backgroundColor:selectedExtractedDates.has(idx) ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}}>
+                        <input type="checkbox" checked={selectedExtractedDates.has(idx)} onChange={() => toggleExtractedDate(idx)} style={{marginTop:'2px'}} />
+                        <div style={{flex:1}}>
+                          <div style={{fontWeight:'600', fontSize:'0.9rem'}}>{date.date}</div>
+                          <div style={{fontSize:'0.85rem', color:'var(--muted)', marginTop:'2px'}}>{date.description}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="label">Manual Milestones (optional)</div>
               {milestones.map((m, idx) => (
                 <div key={idx} className="milestoneRow">
                   <input placeholder="Title" value={m.date_title} onChange={e => updateMilestone(idx, 'date_title', e.target.value)} />
@@ -267,8 +438,20 @@ export default function Contracts() {
               {error && <div className="formError">{error}</div>}
 
               <div className="modalFooter">
-                <button className="btn primary" type="button" onClick={() => setShowUpload(false)} disabled={uploading}>Cancel</button>
-                <button className="btn primary" type="submit" disabled={uploading}>{uploading ? 'Uploading…' : 'Upload'}</button>
+                <button className="btn primary" type="button" onClick={() => {
+                  setShowUpload(false);
+                  setFile(null);
+                  setContName('');
+                  setContDetails('');
+                  setStartDate('');
+                  setEndDate('');
+                  setMilestones([]);
+                  setExtractedDates([]);
+                  setSelectedExtractedDates(new Set());
+                  setPreUploadedContId(null);
+                  setError('');
+                }} disabled={uploading}>Cancel</button>
+                <button className="btn primary" type="submit" disabled={uploading || extractingDates}>{uploading ? 'Uploading…' : 'Upload'}</button>
               </div>
             </form>
           </div>
