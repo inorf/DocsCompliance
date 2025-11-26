@@ -60,65 +60,18 @@ export async function POST(request) {
             // Convert blob to array buffer for PDF parsing
             const arrayBuffer = await downloadData.arrayBuffer();
             try {
-<<<<<<< HEAD
                 let extractedText = '';
-                
-                // Try pdf-parse first (most reliable for text-based PDFs)
+                // Use only pdf-parse-new for PDF extraction
                 try {
-                    const pdfParseMod = require('pdf-parse');
-                    const pdfParse = typeof pdfParseMod === 'function' ? pdfParseMod : pdfParseMod.default;
-                    
-                    if (typeof pdfParse === 'function') {
-                        const buffer = Buffer.from(arrayBuffer);
-                        const data = await pdfParse(buffer);
-                        extractedText = data.text || '';
-                        console.log('pdf-parse extracted:', extractedText.length, 'characters');
-                    }
-                } catch (pdfParseErr) {
-                    console.warn('pdf-parse failed:', pdfParseErr.message);
-=======
-                // Try direct text extraction first
-                text = await downloadData.text();
-                if (!text || text.trim().length < 19) {
-                    // Fallback to PDFParse if native text extraction fails
                     const PDFParse = require('pdf-parse-new');
                     const buffer = Buffer.from(arrayBuffer);
                     const data = await PDFParse(buffer);
-                    text = data.text;
->>>>>>> c8260f47f0c7dd9d7474569395adae5f965a03a2
+                    extractedText = data.text || '';
+                    console.log('pdf-parse-new extracted:', extractedText.length, 'characters');
+                } catch (pdfParseErr) {
+                    console.warn('pdf-parse-new failed:', pdfParseErr.message);
                 }
-                
-                // If pdf-parse didn't work, try pdfjs
-                if (!extractedText || extractedText.trim().length < 20) {
-                    try {
-                        const pdfjs = await import('pdfjs-dist');
-                        
-                        // Use a simple worker implementation
-                        const pdf = await pdfjs.getDocument({ 
-                            data: new Uint8Array(arrayBuffer),
-                            disableWorker: true  // Disable worker for server-side use
-                        }).promise;
-                        
-                        let fullText = '';
-                        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {  // Limit to first 10 pages
-                            try {
-                                const page = await pdf.getPage(i);
-                                const textContent = await page.getTextContent();
-                                fullText += textContent.items.map(item => item.str || '').join(' ') + '\n';
-                            } catch (pageErr) {
-                                console.warn(`Page ${i} extraction failed:`, pageErr.message);
-                            }
-                        }
-                        
-                        extractedText = fullText.trim();
-                        console.log('pdfjs extracted:', extractedText.length, 'characters');
-                    } catch (pdfjsErr) {
-                        console.warn('pdfjs failed:', pdfjsErr.message);
-                    }
-                }
-                
-                // If still no text extracted, return success with empty dates
-                // User can manually add dates if PDF cannot be parsed
+                // If no text extracted, return success with empty dates
                 if (!extractedText || extractedText.trim().length === 0) {
                     console.log('No text could be extracted from PDF - may be image-based or encrypted');
                     return NextResponse.json({
@@ -129,7 +82,6 @@ export async function POST(request) {
                         warning: 'Could not extract text from this PDF. It may be image-based or encrypted. You can manually add dates in the form below.'
                     });
                 }
-                
                 text = extractedText;
             } catch (pdfError) {
                 console.error('PDF extraction error: ', pdfError);

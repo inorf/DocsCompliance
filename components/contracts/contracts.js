@@ -189,6 +189,57 @@ export default function Contracts() {
     setMilestones(m => [...m, { date_title: '', due_date: '', assigned_to: UserProfile.getEmail() }]);
   }
 
+  // Convert various human date formats into ISO yyyy-MM-dd or return null if unparseable
+  function parseToISO(dateStr) {
+    if (!dateStr) return null
+    const s = String(dateStr).trim()
+    // already ISO
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+
+    // try YYYY/MM/DD or YYYY.MM.DD
+    const ymd = s.match(/^(\d{4})[-\/\.](\d{1,2})[-\/\.](\d{1,2})$/)
+    if (ymd) {
+      const y = Number(ymd[1])
+      const m = Number(ymd[2])
+      const d = Number(ymd[3])
+      if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+        return `${y.toString().padStart(4,'0')}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`
+      }
+    }
+
+    // try D/M/YYYY or M/D/YYYY or variants with 2-digit year
+    const dmy = s.match(/^(\d{1,2})[\/\-\. ](\d{1,2})[\/\-\. ](\d{2,4})$/)
+    if (dmy) {
+      let a = Number(dmy[1])
+      let b = Number(dmy[2])
+      let y = Number(dmy[3])
+      if (y < 100) y = 2000 + y
+
+      // decide order: if first > 12 then it's day-month-year; if second > 12 then month-day-year
+      let day, month
+      if (a > 12 && b <= 12) {
+        day = a; month = b
+      } else if (b > 12 && a <= 12) {
+        day = b; month = a
+      } else {
+        // both <=12 or both >12: prefer day-first (DD/MM/YYYY) as default locale
+        day = a; month = b
+      }
+
+      if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        return `${y.toString().padStart(4,'0')}-${month.toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}`
+      }
+    }
+
+    // last-resort: try Date.parse
+    const parsed = new Date(s)
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().slice(0,10)
+    }
+
+    return null
+  }
+
   function updateMilestone(idx, key, value) {
     setMilestones(m => m.map((mm, i) => i === idx ? { ...mm, [key]: value } : mm));
   }
@@ -242,16 +293,41 @@ export default function Contracts() {
       });
 
       if (allMilestones.length > 0) {
-        // normalize milestones to expected shape
-        const datesPayload = allMilestones.map(m => ({ 
-          date_title: m.date_title || 'Milestone', 
-          due_date: m.due_date, 
-          assigned_to: m.assigned_to || email,
-          date_details: m.date_details || ''
-        }));
-        const r3 = await fetch('/api/contracts/create-dates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, cont_id, dates: datesPayload }) });
-        const p3 = await r3.json();
-        if (!p3.success) throw new Error(p3.error || 'Failed to create contract dates');
+        // normalize milestones to expected shape and convert dates to ISO (yyyy-mm-dd)
+        const normalized = allMilestones.map(m => {
+          const parsedISO = parseToISO(m.due_date);
+          return {
+            original_due_date: m.due_date,
+            date_title: m.date_title || 'Milestone',
+            due_date: parsedISO,
+            assigned_to: m.assigned_to || email,
+            date_details: m.date_details || ''
+          }
+        })
+
+        // Filter out entries we couldn't parse to avoid DB errors
+        const invalid = normalized.filter(n => !n.due_date)
+        const toCreate = normalized.filter(n => n.due_date).map(n => ({
+          date_title: n.date_title,
+          due_date: n.due_date,
+          assigned_to: n.assigned_to,
+          date_details: n.date_details || (n.original_due_date ? `Original: ${n.original_due_date}` : '')
+        }))
+
+        if (invalid.length > 0) {
+          // Notify user which dates were skipped due to parse errors
+          const skipped = invalid.map(i => i.original_due_date || '').filter(Boolean)
+          setError(`Skipped ${skipped.length} milestone(s) because their dates couldn't be parsed: ${skipped.join(', ')}. They have been added as manual milestones so you can set correct dates.`)
+          // Add skipped items as manual milestones so the user can correct dates via the form
+          const manualFromSkipped = invalid.map(i => ({ date_title: i.original_due_date || 'Milestone', due_date: '', assigned_to: email, date_details: '' }))
+          setMilestones(prev => [...prev, ...manualFromSkipped])
+        }
+
+        if (toCreate.length > 0) {
+          const r3 = await fetch('/api/contracts/create-dates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, cont_id, dates: toCreate }) });
+          const p3 = await r3.json();
+          if (!p3.success) throw new Error(p3.error || 'Failed to create contract dates');
+        }
       }
 
       // refresh
