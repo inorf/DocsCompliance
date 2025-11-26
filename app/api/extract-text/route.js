@@ -60,6 +60,7 @@ export async function POST(request) {
             // Convert blob to array buffer for PDF parsing
             const arrayBuffer = await downloadData.arrayBuffer();
             try {
+<<<<<<< HEAD
                 let extractedText = '';
                 
                 // Try pdf-parse first (most reliable for text-based PDFs)
@@ -75,6 +76,16 @@ export async function POST(request) {
                     }
                 } catch (pdfParseErr) {
                     console.warn('pdf-parse failed:', pdfParseErr.message);
+=======
+                // Try direct text extraction first
+                text = await downloadData.text();
+                if (!text || text.trim().length < 19) {
+                    // Fallback to PDFParse if native text extraction fails
+                    const PDFParse = require('pdf-parse-new');
+                    const buffer = Buffer.from(arrayBuffer);
+                    const data = await PDFParse(buffer);
+                    text = data.text;
+>>>>>>> c8260f47f0c7dd9d7474569395adae5f965a03a2
                 }
                 
                 // If pdf-parse didn't work, try pdfjs

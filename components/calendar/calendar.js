@@ -193,7 +193,7 @@ export default function Calendar() {
     if (!email || !eventModal.date) return;
     const key = formatDateKey(eventModal.date);
     const existingDeadline = eventModal.event?.deadline_days;
-    const deadlineDays = normalizeDeadlineDays(
+    const deadlineDays = await normalizeDeadlineDays(
       eventData.deadline_days ?? existingDeadline ?? 7
     );
     const assignedTarget = (isAdmin ? eventData.assigned_to : email) || email;
