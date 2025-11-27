@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { getDeadlinesOverdueCounts } from '@/lib/dates';
+import { subscriptionOfGroup } from '@/lib/subsciption';
 
 export async function POST(request) {
   try {
@@ -42,6 +43,13 @@ export async function POST(request) {
     }
 
     const firstName = session.user.name || '';
+    const subResult = await subscriptionOfGroup(userEmail);
+    let subscription = 'none';
+    if (subResult.success && subResult.data && subResult.data.subscription) {
+      subscription = subResult.data.subscription;
+    } else {
+      console.warn('Failed to get subscription info, defaulting to none:', subResult.error);
+    }
 
     // Prepare Brevo contact data
     const brevoContactData = {
@@ -50,6 +58,7 @@ export async function POST(request) {
         FIRSTNAME: firstName,
         DEADLINE_COUNT: deadlineDays,
         OVERDUE_COUNT: overdueDays,
+        SUBSCRIPTION: subscription,
         LAST_SYNC: new Date().toISOString(),
       },
       updateEnabled: true
