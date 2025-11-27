@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
-import { getFileData } from '@/lib/contracts';
+import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function POST(request) {
     try {
@@ -28,11 +28,30 @@ export async function POST(request) {
 
         let text = ''
         // Use server-side admin client to fetch contract metadata and file
-        const download = await getFileData(contId);
-        if (!download.success || !download.data) {
-            return NextResponse.json({ success: false, error: `Failed to download file data: ${download.error}` }, { status: 500 });
+        const supabaseAdmin = await getSupabaseAdmin();
+        const { data: contract, error: contractError } = await supabaseAdmin
+            .from('contracts')
+            .select('file_path')
+            .eq('cont_id', contId)
+            .single()
+
+        if (contractError) {
+            return NextResponse.json({ success: false, error: `Failed to find contract: ${contractError.message}` }, { status: 500 });
         }
-        const downloadData = download.data;
+        if (!contract) {
+            return NextResponse.json({ success: false, error: 'Contract not found' }, { status: 404 });
+        }
+        if (!contract.file_path) {
+            return NextResponse.json({ success: false, error: 'No file path found for contract' }, { status: 404 });
+        }
+
+        const { data: downloadData, error: downloadError } = await supabaseAdmin.storage.from('contracts').download(contract.file_path)
+        if (downloadError) {
+            return NextResponse.json({ success: false, error: `Failed to download file: ${downloadError.message}` }, { status: 500 });
+        }
+        if(!downloadData) {
+            return NextResponse.json({ success: false, error: 'Failed to download file from storage' }, { status: 500 });
+        }
         
         // Use Blob.text() for text-based files
         if (fileExt === 'txt') {
@@ -41,21 +60,40 @@ export async function POST(request) {
             // Convert blob to array buffer for PDF parsing
             const arrayBuffer = await downloadData.arrayBuffer();
             try {
-                // Try direct text extraction first
-                text = await downloadData.text();
-                if (!text || text.trim().length < 19) {
-                    // Fallback to PDFParse if native text extraction fails
+                let extractedText = '';
+                // Use only pdf-parse-new for PDF extraction
+                try {
                     const PDFParse = require('pdf-parse-new');
                     const buffer = Buffer.from(arrayBuffer);
                     const data = await PDFParse(buffer);
-                    text = data.text;
+                    extractedText = data.text || '';
+                    console.log('pdf-parse-new extracted:', extractedText.length, 'characters');
+                } catch (pdfParseErr) {
+                    console.warn('pdf-parse-new failed:', pdfParseErr.message);
                 }
+                // If no text extracted, return success with empty dates
+                if (!extractedText || extractedText.trim().length === 0) {
+                    console.log('No text could be extracted from PDF - may be image-based or encrypted');
+                    return NextResponse.json({
+                        success: true,
+                        dates_found: 0,
+                        extracted_dates: [],
+                        text_sample: '',
+                        warning: 'Could not extract text from this PDF. It may be image-based or encrypted. You can manually add dates in the form below.'
+                    });
+                }
+                text = extractedText;
             } catch (pdfError) {
-                console.error('PDF text extraction failed: ', pdfError);
-                return NextResponse.json({ 
-                    success: false, 
-                    error: 'Failed to extract text from PDF: ' + pdfError.message
-                }, { status: 500 });
+                console.error('PDF extraction error: ', pdfError);
+                // Return success with empty dates instead of error
+                // This allows users to continue with manual date entry
+                return NextResponse.json({
+                    success: true,
+                    dates_found: 0,
+                    extracted_dates: [],
+                    text_sample: '',
+                    warning: 'PDF extraction failed. You can manually add dates in the form below.'
+                });
             }
         } else if (fileExt === 'docx') {
             try {
@@ -104,22 +142,26 @@ function extractDatesWithContext(text) {
     try {
         const datePatterns = [
             // ISO: YYYY-MM-DD
-            /\b\d{4}-\d{2}-\d{2}\b/g,
+            /\d{4}-\d{2}-\d{2}\b/g,
             
             // YYYY/MM/DD
-            /\b\d{4}\/\d{1,2}\/\d{1,2}\b/g,
+            /\d{4}\/\d{1,2}\/\d{1,2}\b/g,
 
-            // US: MM/DD/YYYY or MM-DD-YYYY or European: DD/MM/YYYY or DD-MM-YYYY  
+            // US: MM/DD/YYYY or MM-DD-YYYY
             /\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}\b/g,
             
-            // Month DD, YYYY
+            // Month DD, YYYY (with optional comma)
             /\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/gi,
             
             // DD Month YYYY
             /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}\b/gi,
+            
+            // YYYY Month DD
+            /\b\d{4}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}\b/gi,
         ];
 
         const datesWithContext = [];
+        const seenDates = new Map(); // Track unique dates
         
         datePatterns.forEach(pattern => {
             let match;
@@ -129,8 +171,16 @@ function extractDatesWithContext(text) {
                 const dateStr = match[0];
                 const position = match.index;
                 
+                // Skip if we've already captured this exact date
+                if (seenDates.has(dateStr)) {
+                    continue;
+                }
+                
                 const description = extractContextBetweenBoundaries(text, position, 150);
                 const context = extractContextBetweenBoundaries(text, position, 80);
+                
+                // Add to seen dates
+                seenDates.set(dateStr, true);
                 
                 datesWithContext.push({
                     date: dateStr,
@@ -140,11 +190,35 @@ function extractDatesWithContext(text) {
             }
         });
 
-        const uniqueDates = removeDuplicateDates(datesWithContext);
-        return uniqueDates;
+        // Sort by date (most recent first)
+        datesWithContext.sort((a, b) => {
+            try {
+                const dateA = parseDateString(a.date);
+                const dateB = parseDateString(b.date);
+                return dateB - dateA;
+            } catch (e) {
+                return 0;
+            }
+        });
+
+        return datesWithContext;
     } catch (error) {
         console.error('Date extraction error:', error);
         return [];
+    }
+}
+
+function parseDateString(dateStr) {
+    // Try to parse various date formats
+    try {
+        // ISO format: YYYY-MM-DD
+        if (/\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+            return new Date(dateStr).getTime();
+        }
+        // Other formats - let JavaScript try to parse
+        return new Date(dateStr).getTime();
+    } catch (e) {
+        return 0;
     }
 }
 
@@ -170,16 +244,4 @@ function extractContextBetweenBoundaries(text, position, maxLength = 200) {
     }
     
     return text.substring(start, end).trim().replace(/\s+/g, ' ');
-}
-
-function removeDuplicateDates(datesArray) {
-    const seen = new Set();
-    return datesArray.filter(dateObj => {
-        const key = `${dateObj.date}-${dateObj.description.substring(0, 50)}`;
-        if (seen.has(key)) {
-            return false;
-        }
-        seen.add(key);
-        return true;
-    });
 }
