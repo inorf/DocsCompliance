@@ -26,7 +26,7 @@ export async function POST(request) {
       success: true, 
       message: 'Contact counts updated successfully',
       timestamp: new Date().toISOString()
-    });
+    }, { status: 200 });
     
   } catch (error) {
     console.error('Webhook error:', error);
