@@ -72,6 +72,23 @@ let UserProfile = (function() {
     user_email = "";
     adminD = false;
     isLoggedIn = false;
+    // Clear Brevo identification status from sessionStorage
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('brevo_identified');
+    }
+  };
+
+  let setBrevoIdentified = function(value) {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('brevo_identified', value ? 'true' : 'false');
+    }
+  };
+
+  let getBrevoIdentified = function() {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('brevo_identified') === 'true';
+    }
+    return false;
   };
 
   let logout = async function() {
@@ -95,7 +112,9 @@ let UserProfile = (function() {
     getIsLoggedIn: getIsLoggedIn,
     syncWithServer: syncWithServer,
     clearSession: clearSession,
-    logout: logout
+    logout: logout,
+    setBrevoIdentified: setBrevoIdentified,
+    getBrevoIdentified: getBrevoIdentified
   }
 })();
 

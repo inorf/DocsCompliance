@@ -21,7 +21,6 @@ const MainLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [hasIdentifiedBrevo, setHasIdentifiedBrevo] = useState(false);
 
   const [displayName, setDisplayName] = useState("Loading…");
   const [groupName, setGroupName] = useState("Workspace");
@@ -29,7 +28,10 @@ const MainLayout = ({ children }) => {
   const [showProfile, setShowProfile] = useState(false);
 
   const identifyBrevoUser = async () => {
-    if (hasIdentifiedBrevo) return;
+    // Check sessionStorage to see if Brevo has already been identified
+    if (UserProfile.getBrevoIdentified()) {
+      return;
+    }
     
     try {
       const res = await fetch('/api/brevo/identify-user', {
@@ -60,7 +62,8 @@ const MainLayout = ({ children }) => {
         
         if (result.success) {
           console.log('User identified in Brevo successfully');
-          setHasIdentifiedBrevo(true);
+          // Store in sessionStorage to persist across page reloads/navigation
+          UserProfile.setBrevoIdentified(true);
         } else {
           console.error('Failed to identify user in Brevo:', result.error);
         }
