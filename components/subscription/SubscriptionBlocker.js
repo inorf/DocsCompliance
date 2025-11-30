@@ -27,7 +27,7 @@ export default function SubscriptionBlocker({ children }) {
         headers: { 'Content-Type': 'application/json' }
       });
       const result = await res.json();
-      
+      console.log('Subscription access result:', result);
       if (result.success) {
         setHasAccess(result.access);
         if (!result.access) {
@@ -59,7 +59,8 @@ export default function SubscriptionBlocker({ children }) {
       </div>
     );
   }
-
+  console.log('Subscription Info:', subscriptionInfo);
+  console.log('Has Access:', hasAccess);
   if (!hasAccess) {
     return (
       <div className="subscription-blocker">
