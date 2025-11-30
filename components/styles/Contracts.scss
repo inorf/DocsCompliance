@@ -114,7 +114,7 @@ html:not([data-theme]) {
 
 .btn { background:transparent; border:1px solid var(--muted, #777); padding:6px 10px; border-radius:6px; cursor:pointer }
 .btn.primary { background:var(--accent); border-color:transparent }
-.btn.small { padding:4px 8px; font-size:0.9rem }
+.btn.small { padding:4px 8px; font-size:0.9rem; color: var(--foreground) }
 .btn.secondary { background:transparent; border:1px solid rgba(255,255,255,0.03) }
 .btn.danger { background: transparent; border:1px solid var(--danger, #ff6666); color: var(--danger, #ff6666) }
 
@@ -149,7 +149,7 @@ html[data-theme="light"] .modalHeader h3 {
 @media (prefers-color-scheme: dark) {
   .modalBody { color: var(--foreground); }
 }
-.close { background:transparent; border:0; font-size:20px; cursor:pointer }
+.close { background:transparent; border:0; font-size:20px; cursor:pointer; color:var(--foreground) }
 
 .field { margin-bottom:12px; display:flex; flex-direction:column; gap:6px }
 .field.small { flex:1 }

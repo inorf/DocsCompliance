@@ -424,7 +424,7 @@ export default function Contracts() {
             </div>
             <div className="modalFooter">
               <button className="btn danger" onClick={handleDelete} disabled={deleting}>{deleting ? 'Deleting…' : 'Delete contract'}</button>
-              <button className="btn" onClick={closeDetails}>Close</button>
+              <button className="btn small" onClick={closeDetails}>Close</button>
             </div>
           </div>
         </div>
