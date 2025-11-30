@@ -43,8 +43,8 @@
   --layout-sidebar-border: rgba(255, 255, 255, 0.08);
   --layout-sidebar-text: rgba(255, 255, 255, 0.85);
   --layout-sidebar-active: rgba(129, 140, 248, 0.35);
-  --layout-topbar-bg: rgba(255, 255, 255, 0.82);
-  --layout-topbar-border: rgba(15, 23, 42, 0.08);
+  --layout-topbar-bg: rgba(255, 255, 255, 0.95);
+  --layout-topbar-border: rgba(15, 23, 42, 0.12);
   --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
 }
 
@@ -55,23 +55,23 @@
 [data-theme="light"] .layout .content h2,
 [data-theme="light"] .layout .content h3,
 [data-theme="light"] .layout .content h4 {
-  color: var(--foreground);
+  color: #1e293b;
 }
 
 [data-theme="light"] .layout .content span,
 [data-theme="light"] .layout .content strong,
 [data-theme="light"] .layout .content label {
-  color: var(--muted-foreground);
+  color: #475569;
 }
 
 [data-theme="light"] .topbar__breadcrumbs h1,
 [data-theme="light"] .topbar__user strong {
-  color: var(--foreground);
+  color: #1e293b;
 }
 
 [data-theme="light"] .topbar__eyebrow,
 [data-theme="light"] .topbar__user-label {
-  color: var(--muted-foreground);
+  color: #64748b;
 }
 
 /* System preference fallback - when no data-theme is set */
@@ -81,8 +81,8 @@
     --layout-sidebar-border: rgba(255, 255, 255, 0.08);
     --layout-sidebar-text: rgba(255, 255, 255, 0.85);
     --layout-sidebar-active: rgba(129, 140, 248, 0.35);
-    --layout-topbar-bg: rgba(255, 255, 255, 0.82);
-    --layout-topbar-border: rgba(15, 23, 42, 0.08);
+    --layout-topbar-bg: rgba(255, 255, 255, 0.95);
+    --layout-topbar-border: rgba(15, 23, 42, 0.12);
     --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
   }
 
@@ -93,23 +93,23 @@
   :root:not([data-theme]) .layout .content h2,
   :root:not([data-theme]) .layout .content h3,
   :root:not([data-theme]) .layout .content h4 {
-    color: var(--foreground);
+    color: #1e293b;
   }
 
   :root:not([data-theme]) .layout .content span,
   :root:not([data-theme]) .layout .content strong,
   :root:not([data-theme]) .layout .content label {
-    color: var(--muted-foreground);
+    color: #475569;
   }
 
   :root:not([data-theme]) .topbar__breadcrumbs h1,
   :root:not([data-theme]) .topbar__user strong {
-    color: var(--foreground);
+    color: #1e293b;
   }
 
   :root:not([data-theme]) .topbar__eyebrow,
   :root:not([data-theme]) .topbar__user-label {
-    color: var(--muted-foreground);
+    color: #64748b;
   }
 }
 

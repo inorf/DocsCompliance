@@ -382,7 +382,7 @@ export default function Contracts() {
         <div className="modalOverlay" role="dialog" aria-modal="true">
           <div className="modal">
             <div className="modalHeader">
-              <h3>Contract details</h3>
+              <h3 className="contrDet">Contract details</h3>
               <button className="close" onClick={closeDetails}>×</button>
             </div>
             <div className="modalBody">

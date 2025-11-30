@@ -3,10 +3,12 @@
 $card-bg: #ffffff;
 $accent: #2563eb;
 $accent-light: #dbeafe;
-$text-muted: #6b7280;
-$border: #e5e7eb;
-$danger: #ef4444;
+$text-muted: #64748b;
+$border: #cbd5e1;
+$danger: #dc2626;
 $success: #22c55e;
+$primary-text: #1e293b;
+$secondary-text: #475569;
 
 // Dark theme colors
 $dark-card-bg: #1f2937;
@@ -99,7 +101,7 @@ $dark-text: #f3f4f6;
   h3 {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     margin: 0;
-    color: #0f172a;
+    color: #1e293b;
     font-weight: 700;
   }
 
@@ -109,12 +111,12 @@ $dark-text: #f3f4f6;
   }
 
   :global(html[data-theme="light"]) & h3 {
-    color: #0f172a;
+    color: #1e293b;
   }
 
   .subtitle {
     margin-top: 12px;
-    color: $text-muted;
+    color: #64748b;
     max-width: 620px;
     line-height: 1.6;
   }
@@ -125,7 +127,7 @@ $dark-text: #f3f4f6;
   }
 
   :global(html[data-theme="light"]) & .subtitle {
-    color: $text-muted;
+    color: #64748b;
   }
 }
 
@@ -213,7 +215,7 @@ $dark-text: #f3f4f6;
   .reqName {
     font-weight: 600;
     font-size: 1rem;
-    color: #0f172a;
+    color: #1e293b;
   }
 
   :global(html[data-theme="dark"]) & .reqName,
@@ -222,7 +224,7 @@ $dark-text: #f3f4f6;
   }
 
   :global(html[data-theme="light"]) & .reqName {
-    color: #0f172a;
+    color: #1e293b;
   }
 
   .reqEmail {
@@ -241,7 +243,7 @@ $dark-text: #f3f4f6;
 
   .reqNote {
     margin-top: 6px;
-    color: #111827;
+    color: #475569;
     font-size: 0.9rem;
   }
 
@@ -251,7 +253,7 @@ $dark-text: #f3f4f6;
   }
 
   :global(html[data-theme="light"]) & .reqNote {
-    color: #111827;
+    color: #475569;
   }
 }
 
@@ -345,7 +347,7 @@ $dark-text: #f3f4f6;
   }
 
   td {
-    color: #0f172a;
+    color: #1e293b;
     font-weight: 500;
   }
 
@@ -355,7 +357,7 @@ $dark-text: #f3f4f6;
   }
 
   :global(html[data-theme="light"]) & td {
-    color: #0f172a;
+    color: #1e293b;
   }
 
   .break {
