@@ -154,7 +154,7 @@ html[data-theme="light"] .modalHeader h3 {
 .field { margin-bottom:12px; display:flex; flex-direction:column; gap:6px }
 .field.small { flex:1 }
 .fieldsRow { display:flex; gap:12px }
-.label { font-size:0.85rem; color:#1e293b }
+.label { font-size:0.85rem; color:var(--foreground) }
 input, textarea { padding:8px; border-radius:6px; border:1px solid var(--input-border, rgba(0,0,0,0.12)); background:transparent; color:var(--foreground) }
 textarea { min-height:80px }
 .formError { color: var(--danger, #ff6666); margin-top:8px }
