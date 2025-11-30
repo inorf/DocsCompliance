@@ -102,6 +102,134 @@
   border: 1px solid rgba(22, 163, 74, 0.2);
 }
 
+.settings__error {
+  color: #dc2626;
+  font-weight: 500;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  margin-top: 0.5rem;
+}
+
+.settings__loading,
+.settings__empty {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.settings-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-card__add-user {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.settings-card__input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--input);
+  color: var(--foreground);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--muted-foreground);
+  }
+}
+
+.settings-card__button {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+  &--primary {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+
+    &:hover:not(:disabled) {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+  }
+
+  &--danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+
+    &:hover:not(:disabled) {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.settings-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settings-card__list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+}
+
+.settings-card__user-info {
+  flex: 1;
+}
+
+.settings-card__user-name {
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.settings-card__user-email {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .settings {

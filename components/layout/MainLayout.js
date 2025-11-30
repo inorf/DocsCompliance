@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import UserProfile from '@/app/session/UserProfile';
 import Link from 'next/link';
+import SubscriptionBlocker from '@/components/subscription/SubscriptionBlocker';
 import "../styles/MainLayout.scss";
 
 const navLinks = [
@@ -302,7 +303,11 @@ const MainLayout = ({ children }) => {
           </div>
         </header>
 
-        <main className="content">{children}</main>
+        <main className="content">
+          <SubscriptionBlocker>
+            {children}
+          </SubscriptionBlocker>
+        </main>
       </div>
     </div>
   );

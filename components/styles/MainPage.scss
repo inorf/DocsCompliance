@@ -329,46 +329,94 @@
 }
 
 
-/* Dark-first: apply dark variants by default, light variants under prefers-color-scheme: light */
-.dashboard__hero,
-.stat-card,
-.dashboard__panel {
+/* Theme-based styling */
+html[data-theme="dark"] .dashboard__hero,
+html:not([data-theme]) .dashboard__hero {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(124, 58, 237, 0.18));
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .dashboard__panel,
+html:not([data-theme]) .stat-card,
+html:not([data-theme]) .dashboard__panel {
   background: rgba(15, 23, 42, 0.85);
   border-color: rgba(148, 163, 184, 0.2);
 }
 
-.dashboard__hero {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(124, 58, 237, 0.18));
-}
-
-.dashboard__panel button {
+html[data-theme="dark"] .dashboard__panel button,
+html:not([data-theme]) .dashboard__panel button {
   background: rgba(148, 163, 184, 0.16);
   color: #e2e8f0;
 }
 
-.documents__row {
+html[data-theme="dark"] .documents__row,
+html:not([data-theme]) .documents__row {
   border-color: rgba(148, 163, 184, 0.25);
 }
 
+html[data-theme="light"] .dashboard__hero,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .dashboard__panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="light"] .dashboard__hero {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.12));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+html[data-theme="light"] .dashboard__panel button {
+  background: rgba(15, 23, 42, 0.05);
+  color: inherit;
+}
+
+html[data-theme="light"] .documents__row {
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .dashboard__hero {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(124, 58, 237, 0.18));
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+  
+  html:not([data-theme]) .stat-card,
+  html:not([data-theme]) .dashboard__panel {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+  
+  html:not([data-theme]) .dashboard__panel button {
+    background: rgba(148, 163, 184, 0.16);
+    color: #e2e8f0;
+  }
+  
+  html:not([data-theme]) .documents__row {
+    border-color: rgba(148, 163, 184, 0.25);
+  }
+}
+
 @media (prefers-color-scheme: light) {
-  .dashboard__hero,
-  .stat-card,
-  .dashboard__panel {
+  html:not([data-theme]) .dashboard__hero,
+  html:not([data-theme]) .stat-card,
+  html:not([data-theme]) .dashboard__panel {
     background: rgba(255, 255, 255, 0.9);
     border-color: rgba(15, 23, 42, 0.08);
   }
-
-  .dashboard__hero {
+  
+  html:not([data-theme]) .dashboard__hero {
     background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.12));
     border: 1px solid rgba(99, 102, 241, 0.2);
   }
-
-  .dashboard__panel button {
+  
+  html:not([data-theme]) .dashboard__panel button {
     background: rgba(15, 23, 42, 0.05);
     color: inherit;
   }
-
-  .documents__row {
+  
+  html:not([data-theme]) .documents__row {
     border-color: rgba(15, 23, 42, 0.08);
   }
 }

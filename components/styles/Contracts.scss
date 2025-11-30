@@ -3,26 +3,38 @@
   --on-accent: #ffffff;
 }
 
-/* Light / Dark theme variables scoped for the contracts component */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --surface: #111827; /* dark surface */
-    --foreground: #e6eef6;
-    --muted: #9aa0a6;
-    --accent: linear-gradient(135deg, #2563eb, #7c3aed);
-    --on-accent: #ffffff;
-    --danger: #ff6666;
-    --input-border: rgba(255,255,255,0.12);
-  }
+/* Theme variables scoped for the contracts component */
+:root {
+  --surface: var(--card);
+  --foreground: var(--foreground);
+  --muted: var(--muted-foreground);
+  --accent: linear-gradient(135deg, #2563eb, #7c3aed);
+  --on-accent: #ffffff;
+  --danger: #dc2626;
+  --input-border: var(--border);
+}
+
+[data-theme="light"] {
+  --surface: #ffffff;
+  --foreground: #0b1220;
+  --muted: #556066;
+  --danger: #c03030;
+  --input-border: rgba(0,0,0,0.12);
+}
+
+html:not([data-theme]) {
+  --surface: #111827;
+  --foreground: #e6eef6;
+  --muted: #9aa0a6;
+  --danger: #ff6666;
+  --input-border: rgba(255,255,255,0.12);
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
+  html:not([data-theme]) {
     --surface: #ffffff;
     --foreground: #0b1220;
     --muted: #556066;
-    --accent: linear-gradient(135deg, #2563eb, #7c3aed);
-    --on-accent: #ffffff;
     --danger: #c03030;
     --input-border: rgba(0,0,0,0.12);
   }
@@ -118,23 +130,55 @@ textarea { min-height:80px }
 .milestone-meta { font-size:0.9rem; color:var(--muted); margin-top:4px }
 .milestone-assigned { font-size:0.85rem; color:var(--muted); margin-top:6px }
 
-@media (prefers-color-scheme: dark) {
-  .modalBody { background-color: var(--surface); }
-  .milestone { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03) }
-  /* Details button text should be visible in dark theme */
-  .btn.small { color: var(--on-accent); }
-  /* Make form field borders darker in dark theme */
-  input, textarea { border:1px solid var(--input-border); }
+html[data-theme="dark"] .modalBody,
+html:not([data-theme]) .modalBody {
+  background-color: var(--surface);
 }
+
+html[data-theme="dark"] .milestone,
+html:not([data-theme]) .milestone {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+html[data-theme="light"] .modalBody {
+  background-color: var(--surface);
+}
+
+html[data-theme="light"] .milestone {
+  background: rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+html[data-theme="light"] .contracts-page .btn.primary,
+html[data-theme="light"] .card-actions .btn.primary {
+  color: #ffffff !important;
+}
+
+input, textarea {
+  border: 1px solid var(--input-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .modalBody {
+    background-color: var(--surface);
+  }
+  
+  html:not([data-theme]) .milestone {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+}
+
 @media (prefers-color-scheme: light) {
-  .modalBody { background-color: var(--surface); }
-  .milestone { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.04) }
-  /* Ensure primary button text is white in light theme */
-  /* Use higher specificity to override any other conflicting rules */
-  .contracts-page .btn.primary,
-  .card-actions .btn.primary { color: #ffffff !important; }
-  /* Make form field borders darker in light theme */
-  input, textarea { border:1px solid var(--input-border); }
+  html:not([data-theme]) .modalBody {
+    background-color: var(--surface);
+  }
+  
+  html:not([data-theme]) .milestone {
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
 }
 
 @media (max-width: 900px) {

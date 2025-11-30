@@ -48,9 +48,33 @@
   --ring: #60a5fa;
 }
 
-/* Light theme: applied when user prefers light color scheme */
+/* Light theme: when data-theme="light" */
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #0b1220;
+  --card: #f8fafc;
+  --card-foreground: #0b1220;
+  --popover: #ffffff;
+  --popover-foreground: #0b1220;
+  --primary: #0b1220;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0b1220;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent: #0b1220;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e6eef0;
+  --input: #ffffff;
+  --ring: #60a5fa;
+  --radius: 0.75rem;
+}
+
+/* System preference fallback - when no data-theme is set */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme]) {
     --background: #ffffff;
     --foreground: #0b1220;
     --card: #f8fafc;
@@ -300,50 +324,114 @@ body {
   }
 }
 
+/* Dark theme auth styles */
+[data-theme="dark"] .auth-page,
+:root:not([data-theme]) .auth-page {
+  background: radial-gradient(circle at top, #111b2c 0%, #0c1426 45%, #050913 100%);
+}
+
+[data-theme="dark"] .auth-hero p,
+[data-theme="dark"] .auth-hero__meta,
+:root:not([data-theme]) .auth-hero p,
+:root:not([data-theme]) .auth-hero__meta {
+  color: rgba(226, 232, 240, 0.8);
+}
+
+[data-theme="dark"] .auth-hero h1,
+:root:not([data-theme]) .auth-hero h1 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .auth-card,
+:root:not([data-theme]) .auth-card {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .auth-card__header p,
+[data-theme="dark"] .auth-card__switch,
+:root:not([data-theme]) .auth-card__header p,
+:root:not([data-theme]) .auth-card__switch {
+  color: rgba(226, 232, 240, 0.8);
+}
+
+[data-theme="dark"] .auth-card__switch a,
+:root:not([data-theme]) .auth-card__switch a {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .auth-form__field input,
+:root:not([data-theme]) .auth-form__field input {
+  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.65);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .auth-hero__meta span,
+:root:not([data-theme]) .auth-hero__meta span {
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+[data-theme="dark"] .auth-hero__list,
+:root:not([data-theme]) .auth-hero__list {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .auth-hero__list li::before,
+:root:not([data-theme]) .auth-hero__list li::before {
+  color: #60a5fa;
+}
+
+/* Light theme auth styles */
+[data-theme="light"] .auth-page {
+  background: radial-gradient(circle at top, #f7fbff 0%, #e4ecff 45%, #d4dcf4 100%);
+}
+
 @media (prefers-color-scheme: dark) {
-  .auth-page {
+  :root:not([data-theme]) .auth-page {
     background: radial-gradient(circle at top, #111b2c 0%, #0c1426 45%, #050913 100%);
   }
 
-  .auth-hero p,
-  .auth-hero__meta {
+  :root:not([data-theme]) .auth-hero p,
+  :root:not([data-theme]) .auth-hero__meta {
     color: rgba(226, 232, 240, 0.8);
   }
 
-  .auth-hero h1 {
+  :root:not([data-theme]) .auth-hero h1 {
     color: #f8fafc;
   }
 
-  .auth-card {
+  :root:not([data-theme]) .auth-card {
     background: rgba(15, 23, 42, 0.85);
     border-color: rgba(148, 163, 184, 0.2);
     color: #f8fafc;
   }
 
-  .auth-card__header p,
-  .auth-card__switch {
+  :root:not([data-theme]) .auth-card__header p,
+  :root:not([data-theme]) .auth-card__switch {
     color: rgba(226, 232, 240, 0.8);
   }
 
-  .auth-card__switch a {
+  :root:not([data-theme]) .auth-card__switch a {
     color: #f8fafc;
   }
 
-  .auth-form__field input {
+  :root:not([data-theme]) .auth-form__field input {
     border-color: rgba(148, 163, 184, 0.25);
     background: rgba(15, 23, 42, 0.65);
     color: #f8fafc;
   }
 
-  .auth-hero__meta span {
+  :root:not([data-theme]) .auth-hero__meta span {
     border-color: rgba(148, 163, 184, 0.35);
   }
 
-  .auth-hero__list {
+  :root:not([data-theme]) .auth-hero__list {
     color: #f8fafc;
   }
 
-  .auth-hero__list li::before {
+  :root:not([data-theme]) .auth-hero__list li::before {
     color: #60a5fa;
   }
 }

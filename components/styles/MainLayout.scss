@@ -37,9 +37,46 @@
   color: rgba(226, 232, 240, 0.7);
 }
 
-/* Provide the original light tokens & adjustments when user prefers light */
+/* Light theme - when data-theme="light" */
+[data-theme="light"] {
+  --layout-sidebar-bg: linear-gradient(180deg, #0d1830 0%, #13203a 60%, #111b33 100%);
+  --layout-sidebar-border: rgba(255, 255, 255, 0.08);
+  --layout-sidebar-text: rgba(255, 255, 255, 0.85);
+  --layout-sidebar-active: rgba(129, 140, 248, 0.35);
+  --layout-topbar-bg: rgba(255, 255, 255, 0.82);
+  --layout-topbar-border: rgba(15, 23, 42, 0.08);
+  --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
+}
+
+[data-theme="light"] .layout,
+[data-theme="light"] .layout .content,
+[data-theme="light"] .layout .content p,
+[data-theme="light"] .layout .content h1,
+[data-theme="light"] .layout .content h2,
+[data-theme="light"] .layout .content h3,
+[data-theme="light"] .layout .content h4 {
+  color: var(--foreground);
+}
+
+[data-theme="light"] .layout .content span,
+[data-theme="light"] .layout .content strong,
+[data-theme="light"] .layout .content label {
+  color: var(--muted-foreground);
+}
+
+[data-theme="light"] .topbar__breadcrumbs h1,
+[data-theme="light"] .topbar__user strong {
+  color: var(--foreground);
+}
+
+[data-theme="light"] .topbar__eyebrow,
+[data-theme="light"] .topbar__user-label {
+  color: var(--muted-foreground);
+}
+
+/* System preference fallback - when no data-theme is set */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme]) {
     --layout-sidebar-bg: linear-gradient(180deg, #0d1830 0%, #13203a 60%, #111b33 100%);
     --layout-sidebar-border: rgba(255, 255, 255, 0.08);
     --layout-sidebar-text: rgba(255, 255, 255, 0.85);
@@ -49,29 +86,29 @@
     --layout-content-bg: linear-gradient(135deg, #f8fbff 0%, #f1f5ff 55%, #e3e9ff 100%);
   }
 
-  .layout,
-  .layout .content,
-  .layout .content p,
-  .layout .content h1,
-  .layout .content h2,
-  .layout .content h3,
-  .layout .content h4 {
+  :root:not([data-theme]) .layout,
+  :root:not([data-theme]) .layout .content,
+  :root:not([data-theme]) .layout .content p,
+  :root:not([data-theme]) .layout .content h1,
+  :root:not([data-theme]) .layout .content h2,
+  :root:not([data-theme]) .layout .content h3,
+  :root:not([data-theme]) .layout .content h4 {
     color: var(--foreground);
   }
 
-  .layout .content span,
-  .layout .content strong,
-  .layout .content label {
+  :root:not([data-theme]) .layout .content span,
+  :root:not([data-theme]) .layout .content strong,
+  :root:not([data-theme]) .layout .content label {
     color: var(--muted-foreground);
   }
 
-  .topbar__breadcrumbs h1,
-  .topbar__user strong {
+  :root:not([data-theme]) .topbar__breadcrumbs h1,
+  :root:not([data-theme]) .topbar__user strong {
     color: var(--foreground);
   }
 
-  .topbar__eyebrow,
-  .topbar__user-label {
+  :root:not([data-theme]) .topbar__eyebrow,
+  :root:not([data-theme]) .topbar__user-label {
     color: var(--muted-foreground);
   }
 }
@@ -351,17 +388,57 @@
   font-weight: 600;
 }
 
+html[data-theme="dark"] .profile-popup,
+html:not([data-theme]) .profile-popup {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #e6eefc;
+}
+
+html[data-theme="dark"] .profile-popup__btn,
+html:not([data-theme]) .profile-popup__btn {
+  background: rgba(148, 163, 184, 0.06);
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #e6eefc;
+}
+
+html[data-theme="light"] .profile-popup {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--foreground);
+}
+
+html[data-theme="light"] .profile-popup__btn {
+  background: #fff;
+  border-color: rgba(0,0,0,0.08);
+  color: var(--foreground);
+}
+
 @media (prefers-color-scheme: dark) {
-  .profile-popup {
+  html:not([data-theme]) .profile-popup {
     background: rgba(15, 23, 42, 0.9);
     border-color: rgba(148, 163, 184, 0.16);
     color: #e6eefc;
   }
 
-  .profile-popup__btn {
+  html:not([data-theme]) .profile-popup__btn {
     background: rgba(148, 163, 184, 0.06);
     border-color: rgba(148, 163, 184, 0.22);
     color: #e6eefc;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-theme]) .profile-popup {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: var(--foreground);
+  }
+
+  html:not([data-theme]) .profile-popup__btn {
+    background: #fff;
+    border-color: rgba(0,0,0,0.08);
+    color: var(--foreground);
   }
 }
 

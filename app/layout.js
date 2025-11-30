@@ -3,6 +3,7 @@ import "./globals.css";
 import { UserProfileProvider } from "@/components/context/UserProfileContext";
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script";
+import ThemeInitializer from "@/components/theme/ThemeInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <ThemeInitializer />
         <Analytics />
         <UserProfileProvider>
           {children}

@@ -8,25 +8,13 @@ export default function UserSettings() {
   const [themePreference, setThemePreference] = useState("system");
   const [message, setMessage] = useState(null);
   const [displayName, setDisplayName] = useState("your account");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [trustedUsers, setTrustedUsers] = useState([]);
+  const [loadingTrustedUsers, setLoadingTrustedUsers] = useState(false);
+  const [newTrustedUserEmail, setNewTrustedUserEmail] = useState("");
+  const [error, setError] = useState(null);
 
-  // ✅ SIMPLIFIED: Single useEffect for profile
-  useEffect(() => {
-    setDisplayName(UserProfile.getName() || UserProfile.getEmail() || "your account");
-  }, []);
-
-  // ✅ SIMPLIFIED: Load theme once on mount
-  useEffect(() => {
-    try {
-      const storedTheme = localStorage.getItem('docscompliance_theme');
-      if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
-        setThemePreference(storedTheme);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, []);
-
-  // ✅ OPTIMIZED: Theme application with useCallback
+  // ✅ OPTIMIZED: Theme application with useCallback (defined first)
   const applyTheme = useCallback((theme) => {
     try {
       const root = document.documentElement;
@@ -118,6 +106,107 @@ export default function UserSettings() {
     setTimeout(() => setMessage(null), 2000);
   }, [applyTheme]);
 
+  // ✅ SIMPLIFIED: Single useEffect for profile
+  useEffect(() => {
+    setDisplayName(UserProfile.getName() || UserProfile.getEmail() || "your account");
+    setIsAdmin(UserProfile.getAdmin() || false);
+  }, []);
+
+  // Load trusted users if admin
+  useEffect(() => {
+    if (isAdmin) {
+      fetchTrustedUsers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
+  // ✅ SIMPLIFIED: Load theme once on mount
+  useEffect(() => {
+    try {
+      const storedTheme = localStorage.getItem('docscompliance_theme');
+      if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+        setThemePreference(storedTheme);
+        applyTheme(storedTheme);
+      } else {
+        applyTheme('system');
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [applyTheme]);
+
+  const fetchTrustedUsers = async () => {
+    setLoadingTrustedUsers(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/trusted-users/list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const result = await res.json();
+      if (result.success) {
+        setTrustedUsers(result.data || []);
+      } else {
+        setError(result.error || 'Failed to load trusted users');
+      }
+    } catch (e) {
+      console.error('Failed to fetch trusted users:', e);
+      setError('Failed to load trusted users');
+    } finally {
+      setLoadingTrustedUsers(false);
+    }
+  };
+
+  const handleAddTrustedUser = async () => {
+    if (!newTrustedUserEmail.trim()) {
+      setError('Please enter an email address');
+      return;
+    }
+
+    setError(null);
+    try {
+      const res = await fetch('/api/trusted-users/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_email: newTrustedUserEmail.trim() })
+      });
+      const result = await res.json();
+      if (result.success) {
+        setNewTrustedUserEmail("");
+        setMessage("Trusted user added successfully");
+        setTimeout(() => setMessage(null), 2000);
+        await fetchTrustedUsers();
+      } else {
+        setError(result.error || 'Failed to add trusted user');
+      }
+    } catch (e) {
+      console.error('Failed to add trusted user:', e);
+      setError('Failed to add trusted user');
+    }
+  };
+
+  const handleRemoveTrustedUser = async (userEmail) => {
+    setError(null);
+    try {
+      const res = await fetch('/api/trusted-users/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_email: userEmail })
+      });
+      const result = await res.json();
+      if (result.success) {
+        setMessage("Trusted user removed successfully");
+        setTimeout(() => setMessage(null), 2000);
+        await fetchTrustedUsers();
+      } else {
+        setError(result.error || 'Failed to remove trusted user');
+      }
+    } catch (e) {
+      console.error('Failed to remove trusted user:', e);
+      setError('Failed to remove trusted user');
+    }
+  };
+
   return (
     <section className="settings">
       <header className="settings__hero">
@@ -150,6 +239,62 @@ export default function UserSettings() {
             ))}
           </div>
         </article>
+
+        {isAdmin && (
+          <article className="settings-card">
+            <header>
+              <h3>Trusted Users</h3>
+              <p>Manage users who can access your contracts and dates.</p>
+            </header>
+
+            <div className="settings-card__section">
+              <div className="settings-card__add-user">
+                <input
+                  type="email"
+                  value={newTrustedUserEmail}
+                  onChange={(e) => setNewTrustedUserEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="settings-card__input"
+                />
+                <button
+                  onClick={handleAddTrustedUser}
+                  className="settings-card__button settings-card__button--primary"
+                >
+                  Add User
+                </button>
+              </div>
+
+              {error && (
+                <div className="settings__error">
+                  {error}
+                </div>
+              )}
+
+              {loadingTrustedUsers ? (
+                <div className="settings__loading">Loading trusted users...</div>
+              ) : trustedUsers.length === 0 ? (
+                <div className="settings__empty">No trusted users yet</div>
+              ) : (
+                <div className="settings-card__list">
+                  {trustedUsers.map((user, idx) => (
+                    <div key={idx} className="settings-card__list-item">
+                      <div className="settings-card__user-info">
+                        <div className="settings-card__user-name">{user.name}</div>
+                        <div className="settings-card__user-email">{user.email}</div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveTrustedUser(user.email)}
+                        className="settings-card__button settings-card__button--danger"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        )}
 
         {message && (
           <div className="settings__message">

@@ -239,6 +239,27 @@ export default function Calendar() {
     }
   };
 
+  const handleCompleteEvent = async (eventId) => {
+    const email = userEmail;
+    if (!email) return;
+    try {
+      const res = await fetch('/api/dates/complete', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ date_id: eventId }) 
+      });
+      const result = await res.json();
+      if (result.success) {
+        await refreshEvents(email);
+        setEventModal({ open: false, date: null, event: null });
+      } else {
+        console.error('Complete event error:', result.error);
+      }
+    } catch (e) {
+      console.error('complete error', e);
+    }
+  };
+
   const handleEventClick = (date, event) => {
     setSelectedDate(date);
     setEventModal({ open: true, date, event });
@@ -418,6 +439,7 @@ export default function Calendar() {
           event={eventModal.event}
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
+          onComplete={handleCompleteEvent}
           onClose={() => setEventModal({ open: false, date: null, event: null })}
           currentUserEmail={userEmail}
           isAdmin={isAdmin}
@@ -444,7 +466,7 @@ export default function Calendar() {
   );
 }
 
-function EventModal({ date, event, onSave, onDelete, onClose, currentUserEmail, isAdmin }) {
+function EventModal({ date, event, onSave, onDelete, onComplete, onClose, currentUserEmail, isAdmin }) {
   const [name, setName] = useState(event?.name || '');
   const [description, setDescription] = useState(event?.description || '');
   const [assigned_to, setAssignedTo] = useState(event?.assigned_to || currentUserEmail || '');
@@ -638,13 +660,24 @@ function EventModal({ date, event, onSave, onDelete, onClose, currentUserEmail, 
 
           <div className="event-modal__actions">
             {event && (
-              <button
-                type="button"
-                onClick={() => onDelete(event.id)}
-                className="event-modal__button event-modal__button--delete"
-              >
-                Delete
-              </button>
+              <>
+                {event.status !== 'completed' && (
+                  <button
+                    type="button"
+                    onClick={() => onComplete(event.id)}
+                    className="event-modal__button event-modal__button--complete"
+                  >
+                    Complete
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onDelete(event.id)}
+                  className="event-modal__button event-modal__button--delete"
+                >
+                  Delete
+                </button>
+              </>
             )}
             <div className="event-modal__actions-right">
               <button

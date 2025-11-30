@@ -23,9 +23,26 @@ $dark-text: #f3f4f6;
   justify-content: center;
   align-items: flex-start;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
-  @media (prefers-color-scheme: dark) {
+:global(html[data-theme="dark"]) .page,
+:global(html:not([data-theme])) .page {
+  background: linear-gradient(135deg, rgba(23, 32, 55) 0%, rgba(23, 32, 55, 0.8) 100%);
+}
+
+:global(html[data-theme="light"]) .page {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-theme])) .page {
     background: linear-gradient(135deg, rgba(23, 32, 55) 0%, rgba(23, 32, 55, 0.8) 100%);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :global(html:not([data-theme])) .page {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
   }
 }
 
@@ -36,11 +53,34 @@ $dark-text: #f3f4f6;
   padding: 40px;
   box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(15, 23, 42, 0.05);
+}
 
-  @media (prefers-color-scheme: dark) {
+:global(html[data-theme="dark"]) .main,
+:global(html:not([data-theme])) .main {
+  background: $dark-card-bg;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  border: 1px solid $dark-border;
+}
+
+:global(html[data-theme="light"]) .main {
+  background: $card-bg;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(html:not([data-theme])) .main {
     background: $dark-card-bg;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
     border: 1px solid $dark-border;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :global(html:not([data-theme])) .main {
+    background: $card-bg;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.05);
   }
 }
 
@@ -61,10 +101,15 @@ $dark-text: #f3f4f6;
     margin: 0;
     color: #0f172a;
     font-weight: 700;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text;
-    }
+  :global(html[data-theme="dark"]) & h3,
+  :global(html:not([data-theme])) & h3 {
+    color: $dark-text;
+  }
+
+  :global(html[data-theme="light"]) & h3 {
+    color: #0f172a;
   }
 
   .subtitle {
@@ -72,10 +117,15 @@ $dark-text: #f3f4f6;
     color: $text-muted;
     max-width: 620px;
     line-height: 1.6;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text-muted;
-    }
+  :global(html[data-theme="dark"]) & .subtitle,
+  :global(html:not([data-theme])) & .subtitle {
+    color: $dark-text-muted;
+  }
+
+  :global(html[data-theme="light"]) & .subtitle {
+    color: $text-muted;
   }
 }
 
@@ -108,21 +158,32 @@ $dark-text: #f3f4f6;
   padding: 24px;
   margin-bottom: 32px;
   background: #fdfcff;
+}
 
-  @media (prefers-color-scheme: dark) {
-    border: 1px solid $dark-border;
-    background: #111827;
-  }
+:global(html[data-theme="dark"]) .requestsPanel,
+:global(html:not([data-theme])) .requestsPanel {
+  border: 1px solid $dark-border;
+  background: #111827;
+}
+
+:global(html[data-theme="light"]) .requestsPanel {
+  border: 1px solid $border;
+  background: #fdfcff;
 }
 
 .empty {
   text-align: center;
   color: $text-muted;
   font-style: italic;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color: $dark-text-muted;
-  }
+:global(html[data-theme="dark"]) .empty,
+:global(html:not([data-theme])) .empty {
+  color: $dark-text-muted;
+}
+
+:global(html[data-theme="light"]) .empty {
+  color: $text-muted;
 }
 
 .requestItem {
@@ -132,13 +193,18 @@ $dark-text: #f3f4f6;
   padding: 18px 0;
   border-bottom: 1px solid rgba($border, 0.8);
 
-  @media (prefers-color-scheme: dark) {
-    border-bottom: 1px solid rgba($dark-border, 0.8);
-  }
-
   &:last-child {
     border-bottom: none;
   }
+}
+
+:global(html[data-theme="dark"]) .requestItem,
+:global(html:not([data-theme])) .requestItem {
+  border-bottom: 1px solid rgba($dark-border, 0.8);
+}
+
+:global(html[data-theme="light"]) .requestItem {
+  border-bottom: 1px solid rgba($border, 0.8);
 }
 
 .requestInfo {
@@ -148,29 +214,44 @@ $dark-text: #f3f4f6;
     font-weight: 600;
     font-size: 1rem;
     color: #0f172a;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text;
-    }
+  :global(html[data-theme="dark"]) & .reqName,
+  :global(html:not([data-theme])) & .reqName {
+    color: $dark-text;
+  }
+
+  :global(html[data-theme="light"]) & .reqName {
+    color: #0f172a;
   }
 
   .reqEmail {
     color: $text-muted;
     font-size: 0.9rem;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text-muted;
-    }
+  :global(html[data-theme="dark"]) & .reqEmail,
+  :global(html:not([data-theme])) & .reqEmail {
+    color: $dark-text-muted;
+  }
+
+  :global(html[data-theme="light"]) & .reqEmail {
+    color: $text-muted;
   }
 
   .reqNote {
     margin-top: 6px;
     color: #111827;
     font-size: 0.9rem;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text;
-    }
+  :global(html[data-theme="dark"]) & .reqNote,
+  :global(html:not([data-theme])) & .reqNote {
+    color: $dark-text;
+  }
+
+  :global(html[data-theme="light"]) & .reqNote {
+    color: #111827;
   }
 }
 
@@ -210,10 +291,15 @@ $dark-text: #f3f4f6;
   overflow-x: auto;
   border-radius: 20px;
   border: 1px solid $border;
+}
 
-  @media (prefers-color-scheme: dark) {
-    border: 1px solid $dark-border;
-  }
+:global(html[data-theme="dark"]) .tableWrap,
+:global(html:not([data-theme])) .tableWrap {
+  border: 1px solid $dark-border;
+}
+
+:global(html[data-theme="light"]) .tableWrap {
+  border: 1px solid $border;
 }
 
 .table {
@@ -232,28 +318,44 @@ $dark-text: #f3f4f6;
     letter-spacing: 0.08em;
     color: $text-muted;
     background: $accent-light;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text-muted;
-      background: $dark-accent-light;
-    }
+  :global(html[data-theme="dark"]) & th,
+  :global(html:not([data-theme])) & th {
+    color: $dark-text-muted;
+    background: $dark-accent-light;
+  }
+
+  :global(html[data-theme="light"]) & th {
+    color: $text-muted;
+    background: $accent-light;
   }
 
   tr:not(:last-child) td {
     border-bottom: 1px solid $border;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      border-bottom: 1px solid $dark-border;
-    }
+  :global(html[data-theme="dark"]) & tr:not(:last-child) td,
+  :global(html:not([data-theme])) & tr:not(:last-child) td {
+    border-bottom: 1px solid $dark-border;
+  }
+
+  :global(html[data-theme="light"]) & tr:not(:last-child) td {
+    border-bottom: 1px solid $border;
   }
 
   td {
     color: #0f172a;
     font-weight: 500;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: $dark-text;
-    }
+  :global(html[data-theme="dark"]) & td,
+  :global(html:not([data-theme])) & td {
+    color: $dark-text;
+  }
+
+  :global(html[data-theme="light"]) & td {
+    color: #0f172a;
   }
 
   .break {
@@ -274,11 +376,6 @@ $dark-text: #f3f4f6;
   background: #ef4444;
   color: white;
 
-  @media (prefers-color-scheme: dark) {
-    background: #dc2626;
-    border-color: #dc2626;
-  }
-
   &:hover:not(:disabled) {
     background: #dc2626;
     border-color: #dc2626;
@@ -288,6 +385,17 @@ $dark-text: #f3f4f6;
     opacity: 0.5;
     cursor: not-allowed;
   }
+}
+
+:global(html[data-theme="dark"]) .removeBtn,
+:global(html:not([data-theme])) .removeBtn {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+:global(html[data-theme="light"]) .removeBtn {
+  background: #ef4444;
+  border-color: #ef4444;
 }
 
 @media (max-width: 768px) {
