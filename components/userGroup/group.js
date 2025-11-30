@@ -114,6 +114,31 @@ export default function UserGroup() {
   const acceptRequest = (userEmail) => handleRequestAction(userEmail, true);
   const rejectRequest = (userEmail) => handleRequestAction(userEmail, false);
 
+  const handleRemoveUser = async (userEmail) => {
+    const adminEmail = UserProfile.getEmail();
+    setError(""); // Clear previous errors
+    
+    try {
+      const res = await fetch('/api/group/remove-user', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ userEmail }) 
+      });
+      
+      const payload = await res.json();
+      
+      if (payload.success) {
+        // Refresh members list
+        await fetchMembers(adminEmail);
+      } else {
+        setError(payload.error || 'Failed to remove user');
+      }
+    } catch (e) {
+      console.error('Remove user failed:', e);
+      setError('Failed to remove user');
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.page}>
@@ -123,7 +148,6 @@ export default function UserGroup() {
       </div>
     );
   }
-
   return (
     <div className={styles.page}>
       <div className={styles.main}>
@@ -183,12 +207,13 @@ export default function UserGroup() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                {isAdmin && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan="3" className={styles.empty}>
+                  <td colSpan={isAdmin ? 4 : 3} className={styles.empty}>
                     No members found
                   </td>
                 </tr>
@@ -198,6 +223,19 @@ export default function UserGroup() {
                     <td>{m.name}</td>
                     <td className={styles.break}>{m.email}</td>
                     <td>{m.admin ? 'Admin' : 'Member'}</td>
+                    {isAdmin && (
+                      <td>
+                        {!m.admin && (
+                        <button
+                          className={styles.removeBtn}
+                          onClick={() => handleRemoveUser(m.email)}
+                          title="Remove user from group"
+                        >
+                          Remove
+                        </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
